@@ -7,6 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays, Trash2, Dumbbell, ListChecks, StickyNote, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface WorkoutHistoryProps {
   savedWorkouts: SavedWorkout[];
@@ -16,9 +27,22 @@ interface WorkoutHistoryProps {
 
 export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: WorkoutHistoryProps) {
   const [activeWorkoutId, setActiveWorkoutId] = React.useState<string | null>(null);
+  const [workoutToDeleteId, setWorkoutToDeleteId] = React.useState<string | null>(null);
 
   const toggleWorkoutExpansion = (workoutId: string) => {
     setActiveWorkoutId(prevId => (prevId === workoutId ? null : workoutId));
+  };
+
+  const handleDeleteConfirm = () => {
+    if (workoutToDeleteId) {
+      onDeleteWorkout(workoutToDeleteId);
+    }
+    setWorkoutToDeleteId(null); 
+  };
+
+  const openDeleteDialog = (workoutId: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent card from toggling expansion
+    setWorkoutToDeleteId(workoutId);
   };
 
   if (isLoading) {
@@ -31,7 +55,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
     );
   }
   
-  if (savedWorkouts.length === 0) {
+  if (savedWorkouts.length === 0 && !isLoading) {
     return (
       <div className="mt-10 text-center">
         <ListChecks className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
@@ -67,15 +91,33 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
                     { (workout.workoutNotes && workout.workoutNotes.trim() !== "" || workout.exercises.length > 0) && (
                         isExpanded ? <ChevronUp className="h-6 w-6 text-primary mr-2" /> : <ChevronDown className="h-6 w-6 text-primary mr-2" />
                     )}
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={(e) => { e.stopPropagation(); onDeleteWorkout(workout.id); }} 
-                        className="text-destructive hover:text-red-400 h-10 w-10"
-                        aria-label="delete workout"
-                    >
-                        <Trash2 className="h-5 w-5" />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={(e) => openDeleteDialog(workout.id, e)}
+                            className="text-destructive hover:text-red-400 h-10 w-10"
+                            aria-label="delete workout"
+                        >
+                            <Trash2 className="h-5 w-5" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      {workoutToDeleteId === workout.id && (
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="lowercase">are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription className="lowercase">
+                              this action cannot be undone. this will permanently delete this workout session.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setWorkoutToDeleteId(null)} className="lowercase">cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteConfirm} className="lowercase bg-destructive text-destructive-foreground hover:bg-destructive/90">delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      )}
+                    </AlertDialog>
                   </div>
                 </div>
               </CardHeader>
@@ -112,6 +154,9 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
                       </ul>
                     </div>
                   )}
+                  {(!workout.workoutNotes || workout.workoutNotes.trim() === "") && workout.exercises.length === 0 && (
+                     <p className="text-sm text-muted-foreground lowercase">no details recorded for this workout.</p>
+                  )}
                 </CardContent>
               )}
             </Card>
@@ -121,3 +166,4 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
     </div>
   );
 }
+
