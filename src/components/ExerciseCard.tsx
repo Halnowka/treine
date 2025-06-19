@@ -30,11 +30,12 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
-        <div className="flex justify-between items-center relative">
+        <div className="flex justify-between items-center relative"> {/* Added relative for positioning context */}
           <CardTitle className="text-2xl font-headline text-primary">
-            {exerciseLog.exerciseName}
+            {exerciseLog.exerciseName} {/* Icon removed */}
           </CardTitle>
           
+          {/* Centered set count */}
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <span className="text-3xl font-bold text-primary">{exerciseLog.sets.length}</span>
           </div>
