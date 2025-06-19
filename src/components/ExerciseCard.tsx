@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import type { ExerciseLogEntry, SetData } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
 import { Trash2 } from 'lucide-react';
 import { QuickSetLoggerDialog } from './QuickSetLoggerDialog';
@@ -25,6 +25,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
       sets: [...exerciseLog.sets, newSet],
     };
     onUpdateExerciseLog(updatedLog);
+    setActiveAccordionItem("sets"); // Automatically expand the accordion
   };
 
   const toggleAccordion = () => {
@@ -32,16 +33,16 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
       setActiveAccordionItem(prev => prev === "sets" ? "" : "sets");
     }
   };
-
+  
   const setsContentId = `sets-content-${exerciseLog.exerciseId}`;
 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center relative">
-          <CardTitle className="text-lg font-headline text-primary lowercase">
+          <p className="text-lg font-headline text-primary lowercase">
             {exerciseLog.exerciseName}
-          </CardTitle>
+          </p>
           
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <button
@@ -115,3 +116,4 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
     </Card>
   );
 }
+
