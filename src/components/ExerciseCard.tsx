@@ -40,7 +40,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center relative">
-          <CardTitle className="text-lg font-headline text-primary">
+          <CardTitle className="text-lg font-headline text-primary lowercase">
             {exerciseLog.exerciseName}
           </CardTitle>
           
@@ -52,6 +52,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
               aria-expanded={activeAccordionItem === "sets"}
               aria-controls={setsContentId}
               disabled={exerciseLog.sets.length === 0}
+              aria-label={`expandir series para ${exerciseLog.exerciseName}`}
             >
               {exerciseLog.sets.length}
             </button>
@@ -60,10 +61,10 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
           <Button 
             variant="ghost" 
             onClick={() => setIsQuickSetLoggerOpen(true)} 
-            className="text-primary hover:text-accent-foreground hover:bg-accent text-lg"
-            aria-label={`Add set for ${exerciseLog.exerciseName}`}
+            className="text-primary hover:text-accent-foreground hover:bg-accent text-lg lowercase"
+            aria-label={`add set para ${exerciseLog.exerciseName}`}
           >
-            <PlusCircle className="mr-2 h-5 w-5" /> Add Set
+            <PlusCircle className="mr-2 h-5 w-5" /> add set
           </Button>
         </div>
       </CardHeader>
@@ -77,14 +78,13 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
             onValueChange={setActiveAccordionItem}
           >
             <AccordionItem value="sets" className="border-none">
-              {/* AccordionTrigger is not rendered visibly; the number in header controls expansion */}
               <AccordionContent id={setsContentId} className="pt-2">
                 <ul className="space-y-3">
                   {exerciseLog.sets.map((set, index) => (
                     <li key={set.id} className="p-3 bg-muted/50 rounded-md border border-border/50 shadow-sm">
                       <div className="flex justify-between items-center">
-                        <p className="text-base">
-                          Set {index + 1}: <span className="font-semibold text-primary">{set.reps} reps</span>
+                        <p className="text-base lowercase">
+                          set {index + 1}: <span className="font-semibold text-primary">{set.reps} reps</span>
                           {set.weight && ` at ${set.weight} kg`}
                         </p>
                         <Button 
@@ -92,7 +92,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
                           size="icon" 
                           onClick={() => onDeleteSet(exerciseLog.exerciseId, set.id)} 
                           className="text-destructive hover:text-red-400 h-8 w-8"
-                          aria-label={`Delete set ${index + 1} for ${exerciseLog.exerciseName}`}
+                          aria-label={`deletar set ${index + 1} para ${exerciseLog.exerciseName}`}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -104,7 +104,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
             </AccordionItem>
           </Accordion>
         ) : (
-           <p className="text-muted-foreground text-center py-4">No sets logged yet. Click 'Add Set' to start!</p>
+           <p className="text-muted-foreground text-center py-4 lowercase">nenhuma serie registrada ainda. clique em 'add set' para comecar!</p>
         )}
       </CardContent>
 
