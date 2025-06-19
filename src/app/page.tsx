@@ -71,28 +71,34 @@ export default function HomePage() {
     }
   }, [currentWorkout, isClient]);
 
-  const handleSelectDay = useCallback((day: WorkoutType) => {
-    if (currentWorkout.type === day && currentWorkout.exercises.length > 0) {
-      toast({ title: "workout resumed", description: `continuing with your ${day} workout.` });
+  const handleSelectDay = useCallback((newDay: WorkoutType) => {
+    const isSameDay = currentWorkout.type === newDay;
+    const hasExistingProgress =
+      currentWorkout.exercises.some(ex => ex.sets.length > 0) ||
+      (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '');
+
+    if (isSameDay && hasExistingProgress) {
+      toast({ title: "workout resumed", description: `continuing with your ${newDay} workout.` });
       return;
     }
-    if (currentWorkout.exercises.some(ex => ex.sets.length > 0) || (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '')) {
-        if (!confirm("you have unsaved progress (sets or notes). changing workout type will clear it. continue?")) {
-            return;
-        }
+
+    if (currentWorkout.type !== null && !isSameDay && hasExistingProgress) {
+      if (!confirm("you have unsaved progress (sets or notes) from your previous workout. changing workout type will clear it. continue?")) {
+        return; 
+      }
     }
 
-    const exercisesForDay: ExerciseDefinition[] = day === 'push' ? PUSH_DAY_EXERCISES : PULL_DAY_EXERCISES;
+    const exercisesForDay: ExerciseDefinition[] = newDay === 'push' ? PUSH_DAY_EXERCISES : PULL_DAY_EXERCISES;
     setCurrentWorkout({
-      type: day,
+      type: newDay,
       exercises: exercisesForDay.map(ex => ({
         exerciseId: ex.id,
         exerciseName: ex.name,
         sets: [],
       })),
-      workoutNotes: '',
+      workoutNotes: '', 
     });
-    toast({ title: "workout started", description: `selected ${day} day. let's go!` });
+    toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
   }, [currentWorkout, toast]);
 
   const handleUpdateExerciseLog = useCallback((updatedLog: ExerciseLogEntry) => {
@@ -195,34 +201,6 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
       <Header />
       <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
-
-      {currentWorkout.type && (
-        <div className="my-6 space-y-6">
-          <div className="max-w-xl mx-auto">
-            <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
-              <Edit3 className="mr-2 h-5 w-5" />
-              workout notes ({currentWorkout.type} day)
-            </Label>
-            <Textarea
-              id="workoutNotes"
-              placeholder="add general notes for this workout (e.g., how you felt, overall rpe, etc.)..."
-              value={currentWorkout.workoutNotes || ''}
-              onChange={handleWorkoutNotesChange}
-              className="min-h-[100px] text-base bg-card border-border shadow-sm"
-            />
-          </div>
-          <div className="text-center">
-            <Button 
-              onClick={handleSaveWorkout} 
-              size="lg" 
-              className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 lowercase"
-              disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
-            >
-              <Save className="mr-2 h-6 w-6" /> save current workout
-            </Button>
-          </div>
-        </div>
-      )}
       
       {!currentWorkout.type && (
          <Alert className="my-8 border-accent bg-card shadow-md">
@@ -255,6 +233,34 @@ export default function HomePage() {
           </Alert>
       )}
 
+      {currentWorkout.type && (
+        <div className="my-6 space-y-6">
+          <div className="max-w-xl mx-auto">
+            <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
+              <Edit3 className="mr-2 h-5 w-5" />
+              workout notes ({currentWorkout.type} day)
+            </Label>
+            <Textarea
+              id="workoutNotes"
+              placeholder="add general notes for this workout (e.g., how you felt, overall rpe, etc.)..."
+              value={currentWorkout.workoutNotes || ''}
+              onChange={handleWorkoutNotesChange}
+              className="min-h-[100px] text-base bg-card border-border shadow-sm"
+            />
+          </div>
+          <div className="text-center">
+            <Button 
+              onClick={handleSaveWorkout} 
+              size="lg" 
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 lowercase"
+              disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
+            >
+              <Save className="mr-2 h-6 w-6" /> save current workout
+            </Button>
+          </div>
+        </div>
+      )}
+
       <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} isLoading={isLoadingHistory} />
       
       <footer className="text-center mt-12 py-6 border-t border-border">
@@ -263,4 +269,3 @@ export default function HomePage() {
     </div>
   );
 }
-
