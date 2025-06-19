@@ -25,7 +25,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
       sets: [...exerciseLog.sets, newSet],
     };
     onUpdateExerciseLog(updatedLog);
-    setActiveAccordionItem("sets"); // Automatically expand the accordion
+    setActiveAccordionItem("sets"); 
   };
 
   const toggleAccordion = () => {
@@ -69,7 +69,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {exerciseLog.sets.length > 0 ? (
+        {exerciseLog.sets.length > 0 && (
           <Accordion 
             type="single" 
             collapsible 
@@ -102,8 +102,6 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-        ) : (
-           <p className="text-muted-foreground text-center py-4 lowercase">no sets logged yet. click 'add set' to start!</p>
         )}
       </CardContent>
 
@@ -116,4 +114,3 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
     </Card>
   );
 }
-
