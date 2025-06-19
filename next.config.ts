@@ -1,14 +1,17 @@
+
 import type {NextConfig} from 'next';
 
+// IMPORTANT: Replace 'your-repo-name' with the actual name of your GitHub repository
+// If your GitHub Pages site is at the root (e.g., username.github.io),
+// then set basePath to '' and assetPrefix to '/'.
+const repoName = 'your-repo-name'; // <<<<====== CHANGE THIS
+
 const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  output: 'export', // Enables static HTML export
+  basePath: process.env.NODE_ENV === 'production' ? `/${repoName}` : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? `/${repoName}/` : '',
   images: {
+    unoptimized: true, // Necessary for static exports with next/image
     remotePatterns: [
       {
         protocol: 'https',
@@ -17,6 +20,12 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
