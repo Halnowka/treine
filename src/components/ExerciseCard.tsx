@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -5,7 +6,7 @@ import type { ExerciseLogEntry, SetData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { PlusCircle, Trash2, Dumbbell } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react';
 import { QuickSetLoggerDialog } from './QuickSetLoggerDialog';
 
 interface ExerciseCardProps {
@@ -29,12 +30,22 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-headline text-primary flex items-center">
-            <Dumbbell className="mr-3 h-6 w-6" />
+        <div className="flex justify-between items-center relative">
+          <CardTitle className="text-2xl font-headline text-primary">
             {exerciseLog.exerciseName}
           </CardTitle>
-          <Button size="sm" variant="ghost" onClick={() => setIsQuickSetLoggerOpen(true)} className="text-primary hover:text-accent-foreground hover:bg-accent">
+          
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <span className="text-3xl font-bold text-primary">{exerciseLog.sets.length}</span>
+          </div>
+          
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setIsQuickSetLoggerOpen(true)} 
+            className="text-primary hover:text-accent-foreground hover:bg-accent"
+            aria-label={`Add set for ${exerciseLog.exerciseName}`}
+          >
             <PlusCircle className="mr-2 h-5 w-5" /> Add Set
           </Button>
         </div>
@@ -55,7 +66,13 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
                           Set {index + 1}: <span className="font-semibold text-primary">{set.reps} reps</span>
                           {set.weight && ` at ${set.weight} kg`}
                         </p>
-                        <Button variant="ghost" size="icon" onClick={() => onDeleteSet(exerciseLog.exerciseId, set.id)} className="text-destructive hover:text-red-400 h-8 w-8">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => onDeleteSet(exerciseLog.exerciseId, set.id)} 
+                          className="text-destructive hover:text-red-400 h-8 w-8"
+                          aria-label={`Delete set ${index + 1} for ${exerciseLog.exerciseName}`}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
