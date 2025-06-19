@@ -9,47 +9,46 @@ import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info } from 'lucide-react';
+import { Save, AlertTriangle, Info, Edit3 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 const LOCAL_STORAGE_KEY_WORKOUTS = 'kineticTrackerWorkouts';
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
 
 export default function HomePage() {
-  const [currentWorkout, setCurrentWorkout] = useState<CurrentWorkout>({ type: null, exercises: [] });
+  const [currentWorkout, setCurrentWorkout] = useState<CurrentWorkout>({ type: null, exercises: [], workoutNotes: '' });
   const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([]);
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
-    // Load saved workouts from localStorage
     const storedWorkouts = localStorage.getItem(LOCAL_STORAGE_KEY_WORKOUTS);
     if (storedWorkouts) {
       setSavedWorkouts(JSON.parse(storedWorkouts));
     }
-    // Load current workout progress from localStorage
     const storedCurrentWorkout = localStorage.getItem(LOCAL_STORAGE_KEY_CURRENT_WORKOUT);
     if (storedCurrentWorkout) {
       setCurrentWorkout(JSON.parse(storedCurrentWorkout));
+    } else {
+      setCurrentWorkout({ type: null, exercises: [], workoutNotes: '' });
     }
   }, []);
 
   useEffect(() => {
     if (isClient) {
-      // Save current workout progress to localStorage
       localStorage.setItem(LOCAL_STORAGE_KEY_CURRENT_WORKOUT, JSON.stringify(currentWorkout));
     }
   }, [currentWorkout, isClient]);
 
   const handleSelectDay = useCallback((day: WorkoutType) => {
     if (currentWorkout.type === day && currentWorkout.exercises.length > 0) {
-      // If re-selecting the same day with existing progress, do nothing or confirm reset
       toast({ title: "Workout Resumed", description: `Continuing with your ${day} day workout.` });
       return;
     }
-    if (currentWorkout.exercises.some(ex => ex.sets.length > 0)) {
-        // If there's progress on a different day type, confirm before switching
+    if (currentWorkout.exercises.some(ex => ex.sets.length > 0) || (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '')) {
         if (!confirm("You have unsaved progress. Switching workout type will clear it. Continue?")) {
             return;
         }
@@ -62,8 +61,8 @@ export default function HomePage() {
         exerciseId: ex.id,
         exerciseName: ex.name,
         sets: [],
-        notes: '', // Initialize notes for the exercise
       })),
+      workoutNotes: '', // Reset workout notes when starting a new day
     });
     toast({ title: "Workout Started", description: `Selected ${day} day. Let's get to it!` });
   }, [currentWorkout, toast]);
@@ -89,6 +88,12 @@ export default function HomePage() {
     toast({ title: "Set Deleted", variant: "destructive" });
   }, [toast]);
 
+  const handleWorkoutNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCurrentWorkout(prev => ({
+        ...prev,
+        workoutNotes: e.target.value,
+    }));
+  };
 
   const handleSaveWorkout = useCallback(() => {
     if (!currentWorkout.type || currentWorkout.exercises.every(ex => ex.sets.length === 0)) {
@@ -104,7 +109,8 @@ export default function HomePage() {
       id: crypto.randomUUID(),
       date: new Date().toISOString(),
       type: currentWorkout.type,
-      exercises: currentWorkout.exercises.filter(ex => ex.sets.length > 0), // Only save exercises with logged sets
+      exercises: currentWorkout.exercises.filter(ex => ex.sets.length > 0),
+      workoutNotes: currentWorkout.workoutNotes,
     };
 
     const updatedSavedWorkouts = [...savedWorkouts, newSavedWorkout];
@@ -113,8 +119,7 @@ export default function HomePage() {
       localStorage.setItem(LOCAL_STORAGE_KEY_WORKOUTS, JSON.stringify(updatedSavedWorkouts));
     }
 
-    // Reset current workout
-    setCurrentWorkout({ type: null, exercises: [] });
+    setCurrentWorkout({ type: null, exercises: [], workoutNotes: '' });
     if (isClient) {
         localStorage.removeItem(LOCAL_STORAGE_KEY_CURRENT_WORKOUT);
     }
@@ -135,7 +140,6 @@ export default function HomePage() {
   }, [savedWorkouts, toast, isClient]);
 
   if (!isClient) {
-    // Render a loading state or null during SSR to prevent hydration mismatch
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
         <Header />
@@ -150,24 +154,39 @@ export default function HomePage() {
       <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
 
       {currentWorkout.type && (
-        <div className="my-6 text-center">
-          <Button 
-            onClick={handleSaveWorkout} 
-            size="lg" 
-            className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
-            disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0)}
-          >
-            <Save className="mr-2 h-6 w-6" /> Save Current Workout
-          </Button>
+        <div className="my-6 space-y-6">
+          <div className="max-w-xl mx-auto">
+            <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center">
+              <Edit3 className="mr-2 h-5 w-5" />
+              Anotações do Treino ({currentWorkout.type} Day)
+            </Label>
+            <Textarea
+              id="workoutNotes"
+              placeholder="Adicione anotações gerais para este treino (ex: como se sentiu, RPE geral, etc.)..."
+              value={currentWorkout.workoutNotes || ''}
+              onChange={handleWorkoutNotesChange}
+              className="min-h-[100px] text-base bg-card border-border shadow-sm"
+            />
+          </div>
+          <div className="text-center">
+            <Button 
+              onClick={handleSaveWorkout} 
+              size="lg" 
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+              disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0)}
+            >
+              <Save className="mr-2 h-6 w-6" /> Salvar Treino Atual
+            </Button>
+          </div>
         </div>
       )}
       
       {!currentWorkout.type && (
          <Alert className="my-8 border-accent bg-card shadow-md">
            <Info className="h-5 w-5 text-accent" />
-           <AlertTitle className="font-headline text-accent text-xl">Welcome to Kinetic Tracker!</AlertTitle>
+           <AlertTitle className="font-headline text-accent text-xl">Bem-vindo ao Kinetic Tracker!</AlertTitle>
            <AlertDescription className="text-muted-foreground text-base">
-             Select 'Push Day' or 'Pull Day' above to start logging your exercises. Your progress will be saved automatically.
+             Selecione 'Push Day' ou 'Pull Day' acima para começar a registrar seus exercícios. Seu progresso será salvo automaticamente.
            </AlertDescription>
          </Alert>
       )}
@@ -186,9 +205,9 @@ export default function HomePage() {
       {currentWorkout.type && currentWorkout.exercises.length === 0 && (
           <Alert variant="destructive" className="my-8">
             <AlertTriangle className="h-5 w-5" />
-            <AlertTitle className="font-headline">No Exercises Loaded</AlertTitle>
+            <AlertTitle className="font-headline">Nenhum Exercício Carregado</AlertTitle>
             <AlertDescription>
-              There might be an issue loading exercises for {currentWorkout.type} day. Please try re-selecting the day.
+              Pode haver um problema ao carregar os exercícios para o dia de {currentWorkout.type}. Por favor, tente selecionar o dia novamente.
             </AlertDescription>
           </Alert>
       )}
@@ -196,7 +215,7 @@ export default function HomePage() {
       <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} />
       
       <footer className="text-center mt-12 py-6 border-t border-border">
-        <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} Kinetic Tracker. Keep Pushing, Keep Pulling!</p>
+        <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} Kinetic Tracker. Continue Pushing, Continue Pulling!</p>
       </footer>
     </div>
   );

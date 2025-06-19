@@ -13,37 +13,31 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Save } from 'lucide-react';
 
 interface QuickSetLoggerDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onLogSet: (reps: number, weight?: number, notes?: string) => void;
+  onLogSet: (reps: number, weight?: number) => void; // Removed notes from here
   exerciseName: string;
 }
 
 export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseName }: QuickSetLoggerDialogProps) {
   const [reps, setReps] = useState<number>(8); // Default reps
   const [weight, setWeight] = useState<string>('');
-  const [notes, setNotes] = useState<string>('');
 
   const repOptions = Array.from({ length: 30 }, (_, i) => i + 1);
 
   const handleSubmit = () => {
-    onLogSet(reps, weight ? parseFloat(weight) : undefined, notes);
-    // Reset form for next entry, or close dialog
-    setWeight('');
-    setNotes('');
-    onOpenChange(false);
+    onLogSet(reps, weight ? parseFloat(weight) : undefined);
+    setWeight(''); // Reset weight for next entry
+    onOpenChange(false); // Close dialog after logging
   };
   
-  // Reset local state when dialog opens/closes or exercise changes
   useEffect(() => {
     if (isOpen) {
-      setReps(8); // Reset to default when opening
+      setReps(8); 
       setWeight('');
-      setNotes('');
     }
   }, [isOpen, exerciseName]);
 
@@ -74,33 +68,21 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="weight" className="text-right col-span-1 text-muted-foreground">
-              Weight (kg)
+              Peso (kg)
             </Label>
             <Input
               id="weight"
               type="number"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              placeholder="Optional"
+              placeholder="Opcional (para lastro)"
               className="col-span-3 h-12 text-lg"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="notes" className="text-right col-span-1 pt-3 text-muted-foreground">
-              Notes
-            </Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Optional set notes (e.g., form check)"
-              className="col-span-3 min-h-[80px] text-base"
             />
           </div>
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" className="h-12 text-base">Cancel</Button>
+            <Button variant="outline" className="h-12 text-base">Cancelar</Button>
           </DialogClose>
           <Button onClick={handleSubmit} className="h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground">
             <Save className="mr-2 h-5 w-5" /> Log Set

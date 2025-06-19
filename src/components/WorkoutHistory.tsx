@@ -2,9 +2,9 @@
 
 import type { SavedWorkout } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CalendarDays, Trash2, Dumbbell, ListChecks } from 'lucide-react';
+import { CalendarDays, Trash2, Dumbbell, ListChecks, StickyNote } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 interface WorkoutHistoryProps {
@@ -17,8 +17,8 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout }: WorkoutHistor
     return (
       <div className="mt-10 text-center">
         <ListChecks className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-        <h3 className="text-2xl font-headline text-primary mb-2">Workout History</h3>
-        <p className="text-muted-foreground">No workouts saved yet. Complete a session and save it to see it here!</p>
+        <h3 className="text-2xl font-headline text-primary mb-2">Histórico de Treinos</h3>
+        <p className="text-muted-foreground">Nenhum treino salvo ainda. Complete uma sessão e salve-a para vê-la aqui!</p>
       </div>
     );
   }
@@ -26,7 +26,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout }: WorkoutHistor
   return (
     <div className="mt-10">
       <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center">
-         <ListChecks className="mr-3 h-8 w-8" /> Workout History
+         <ListChecks className="mr-3 h-8 w-8" /> Histórico de Treinos
       </h3>
       <div className="space-y-6">
         {savedWorkouts.sort((a,b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()).map((workout) => (
@@ -45,28 +45,35 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout }: WorkoutHistor
                 </div>
                  <Button variant="ghost" size="icon" onClick={() => onDeleteWorkout(workout.id)} className="text-destructive hover:text-red-400 h-10 w-10">
                     <Trash2 className="h-5 w-5" />
-                    <span className="sr-only">Delete workout</span>
+                    <span className="sr-only">Deletar treino</span>
                  </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <Accordion type="single" collapsible className="w-full">
+              {workout.workoutNotes && (
+                <div className="mb-4 p-3 bg-muted/30 rounded-md border border-border/30">
+                  <h4 className="font-semibold text-accent text-md flex items-center mb-1">
+                    <StickyNote className="mr-2 h-5 w-5" />
+                    Anotações do Treino:
+                  </h4>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{workout.workoutNotes}</p>
+                </div>
+              )}
+              <Accordion type="single" collapsible className="w-full" defaultValue={workout.exercises.length > 0 ? "details" : undefined}>
                 <AccordionItem value="details">
                   <AccordionTrigger className="text-lg hover:text-accent-foreground font-semibold">
-                    View Exercises ({workout.exercises.length})
+                    Ver Exercícios ({workout.exercises.length})
                   </AccordionTrigger>
                   <AccordionContent>
                     <ul className="space-y-4 mt-2">
                       {workout.exercises.map((exerciseLog) => (
                         <li key={exerciseLog.exerciseId} className="p-3 bg-muted/50 rounded-md border border-border/50">
                           <h4 className="font-semibold text-primary text-lg">{exerciseLog.exerciseName}</h4>
-                          {exerciseLog.notes && <p className="text-sm text-muted-foreground italic mb-1">Notes: {exerciseLog.notes}</p>}
                           <ul className="space-y-1 mt-1 pl-4 list-disc list-inside text-sm">
                             {exerciseLog.sets.map((set, idx) => (
                               <li key={set.id}>
                                 Set {idx + 1}: {set.reps} reps
                                 {set.weight && ` at ${set.weight} kg`}
-                                {set.notes && <span className="text-xs text-muted-foreground/80 italic"> - {set.notes}</span>}
                               </li>
                             ))}
                           </ul>

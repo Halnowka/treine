@@ -3,11 +3,9 @@
 import { useState } from 'react';
 import type { ExerciseLogEntry, SetData } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { PlusCircle, Edit3, Trash2, Dumbbell, Info } from 'lucide-react';
+import { PlusCircle, Trash2, Dumbbell } from 'lucide-react';
 import { QuickSetLoggerDialog } from './QuickSetLoggerDialog';
 
 interface ExerciseCardProps {
@@ -18,29 +16,15 @@ interface ExerciseCardProps {
 
 export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: ExerciseCardProps) {
   const [isQuickSetLoggerOpen, setIsQuickSetLoggerOpen] = useState(false);
-  const [exerciseNotes, setExerciseNotes] = useState(exerciseLog.notes || '');
 
-  const handleLogSet = (reps: number, weight?: number, notes?: string) => {
-    const newSet: SetData = { id: crypto.randomUUID(), reps, weight, notes };
+  const handleLogSet = (reps: number, weight?: number) => {
+    const newSet: SetData = { id: crypto.randomUUID(), reps, weight };
     const updatedLog = {
       ...exerciseLog,
       sets: [...exerciseLog.sets, newSet],
     };
     onUpdateExerciseLog(updatedLog);
   };
-  
-  const handleExerciseNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setExerciseNotes(e.target.value);
-  };
-
-  const handleSaveExerciseNotes = () => {
-     const updatedLog = {
-      ...exerciseLog,
-      notes: exerciseNotes,
-    };
-    onUpdateExerciseLog(updatedLog);
-  };
-
 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
@@ -56,8 +40,8 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
         </div>
       </CardHeader>
       <CardContent>
-        <Accordion type="single" collapsible className="w-full">
-          {exerciseLog.sets.length > 0 && (
+        {exerciseLog.sets.length > 0 ? (
+          <Accordion type="single" collapsible className="w-full" defaultValue="sets">
             <AccordionItem value="sets">
               <AccordionTrigger className="text-lg hover:text-accent-foreground font-semibold">
                 Logged Sets ({exerciseLog.sets.length})
@@ -75,34 +59,13 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      {set.notes && <p className="text-sm text-muted-foreground mt-1 pl-1 border-l-2 border-accent ml-1">Notes: {set.notes}</p>}
                     </li>
                   ))}
                 </ul>
               </AccordionContent>
             </AccordionItem>
-          )}
-          
-          <AccordionItem value="exercise-notes">
-            <AccordionTrigger className="text-lg hover:text-accent-foreground font-semibold">
-              <Info className="mr-2 h-5 w-5 text-primary" />
-              Exercise Notes
-            </AccordionTrigger>
-            <AccordionContent className="pt-2">
-              <Textarea
-                placeholder="Add general notes for this exercise (e.g., form cues, RPE target)..."
-                value={exerciseNotes}
-                onChange={handleExerciseNotesChange}
-                className="min-h-[80px] text-base mb-2"
-              />
-              <Button size="sm" onClick={handleSaveExerciseNotes} className="bg-accent text-accent-foreground hover:bg-accent/80">
-                <Edit3 className="mr-2 h-4 w-4" /> Save Notes
-              </Button>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-
-        {exerciseLog.sets.length === 0 && (
+          </Accordion>
+        ) : (
            <p className="text-muted-foreground text-center py-4">No sets logged yet. Click 'Add Set' to start!</p>
         )}
       </CardContent>
