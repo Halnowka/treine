@@ -54,7 +54,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
           <Accordion type="single" collapsible className="w-full" defaultValue="sets">
             <AccordionItem value="sets">
               <AccordionTrigger className="text-lg hover:text-accent-foreground font-semibold">
-                Logged Sets ({exerciseLog.sets.length})
+                Séries ({exerciseLog.sets.length})
               </AccordionTrigger>
               <AccordionContent>
                 <ul className="space-y-3 mt-2">
