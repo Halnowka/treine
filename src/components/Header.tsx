@@ -8,7 +8,7 @@ export function Header() {
         <BarChartBig className="w-10 h-10 text-primary mr-3" />
         <h1 className="text-4xl font-headline font-bold text-primary lowercase">kinetic tracker</h1>
       </div>
-      <p className="text-muted-foreground lowercase">registre seus treinos de push & pull com facilidade.</p>
+      <p className="text-muted-foreground lowercase">log your push & pull workouts with ease.</p>
     </header>
   );
 }

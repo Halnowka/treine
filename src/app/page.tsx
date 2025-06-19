@@ -56,7 +56,7 @@ export default function HomePage() {
         setSavedWorkouts(workoutList);
       } catch (error) {
         console.error("error fetching workouts: ", error);
-        toast({ title: "erro ao carregar historico", description: "nao foi possivel carregar o historico de treinos do banco de dados.", variant: "destructive" });
+        toast({ title: "error fetching workouts", description: "could not load workout history from the database.", variant: "destructive" });
       }
       setIsLoadingHistory(false);
     };
@@ -73,11 +73,11 @@ export default function HomePage() {
 
   const handleSelectDay = useCallback((day: WorkoutType) => {
     if (currentWorkout.type === day && currentWorkout.exercises.length > 0) {
-      toast({ title: "treino retomado", description: `continuando com seu treino de ${day}.` });
+      toast({ title: "workout resumed", description: `continuing with your ${day} workout.` });
       return;
     }
     if (currentWorkout.exercises.some(ex => ex.sets.length > 0) || (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '')) {
-        if (!confirm("voce tem progresso nao salvo. mudar o tipo de treino ira limpa-lo. continuar?")) {
+        if (!confirm("you have unsaved progress. changing workout type will clear it. continue?")) {
             return;
         }
     }
@@ -92,7 +92,7 @@ export default function HomePage() {
       })),
       workoutNotes: '',
     });
-    toast({ title: "treino iniciado", description: `selecionado dia de ${day}. vamos nessa!` });
+    toast({ title: "workout started", description: `selected ${day} day. let's go!` });
   }, [currentWorkout, toast]);
 
   const handleUpdateExerciseLog = useCallback((updatedLog: ExerciseLogEntry) => {
@@ -113,7 +113,7 @@ export default function HomePage() {
           : ex
       ),
     }));
-    toast({ title: "serie deletada", variant: "destructive" });
+    toast({ title: "set deleted", variant: "destructive" });
   }, [toast]);
 
   const handleWorkoutNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -124,10 +124,10 @@ export default function HomePage() {
   };
 
   const handleSaveWorkout = useCallback(async () => {
-    if (!currentWorkout.type || currentWorkout.exercises.every(ex => ex.sets.length === 0)) {
+    if (!currentWorkout.type || (currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === ''))) {
       toast({
-        title: "nao e possivel salvar o treino",
-        description: "por favor, selecione um tipo de treino e registre pelo menos uma serie para um exercicio.",
+        title: "cannot save workout",
+        description: "please select a workout type and log at least one set or add workout notes.",
         variant: "destructive",
       });
       return;
@@ -161,12 +161,12 @@ export default function HomePage() {
         }
 
         toast({
-          title: "treino salvo!",
-          description: `seu treino de ${currentWorkout.type} foi salvo com sucesso no banco de dados.`,
+          title: "workout saved!",
+          description: `your ${currentWorkout.type} workout was successfully saved to the database.`,
         });
     } catch (error) {
         console.error("error saving workout: ", error);
-        toast({ title: "erro ao salvar", description: "nao foi possivel salvar o treino no banco de dados.", variant: "destructive" });
+        toast({ title: "error saving workout", description: "could not save workout to the database.", variant: "destructive" });
     }
   }, [currentWorkout, toast, isClient]);
 
@@ -174,10 +174,10 @@ export default function HomePage() {
     try {
         await deleteDoc(doc(db, 'workouts', workoutId));
         setSavedWorkouts(prev => prev.filter(w => w.id !== workoutId));
-        toast({ title: "treino deletado", description: "o treino foi removido do seu historico.", variant: "destructive" });
+        toast({ title: "workout deleted", description: "the workout has been removed from your history.", variant: "destructive" });
     } catch (error) {
         console.error("error deleting workout: ", error);
-        toast({ title: "erro ao deletar", description: "nao foi possivel deletar o treino do banco de dados.", variant: "destructive"});
+        toast({ title: "error deleting workout", description: "could not delete workout from the database.", variant: "destructive"});
     }
   }, [toast]);
 
@@ -185,8 +185,8 @@ export default function HomePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
         <Header />
-        <p className="text-xl text-primary">carregando kinetic tracker...</p>
-        {isLoadingHistory && <p className="text-md text-muted-foreground">acessando historico de treinos...</p>}
+        <p className="text-xl text-primary lowercase">loading kinetic tracker...</p>
+        {isLoadingHistory && <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>}
       </div>
     );
   }
@@ -199,13 +199,13 @@ export default function HomePage() {
       {currentWorkout.type && (
         <div className="my-6 space-y-6">
           <div className="max-w-xl mx-auto">
-            <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center">
+            <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
               <Edit3 className="mr-2 h-5 w-5" />
-              anotacoes do treino ({currentWorkout.type} day)
+              workout notes ({currentWorkout.type} day)
             </Label>
             <Textarea
               id="workoutNotes"
-              placeholder="adicione anotacoes gerais para este treino (ex: como se sentiu, rpe geral, etc.)..."
+              placeholder="add general notes for this workout (e.g., how you felt, overall rpe, etc.)..."
               value={currentWorkout.workoutNotes || ''}
               onChange={handleWorkoutNotesChange}
               className="min-h-[100px] text-base bg-card border-border shadow-sm"
@@ -215,10 +215,10 @@ export default function HomePage() {
             <Button 
               onClick={handleSaveWorkout} 
               size="lg" 
-              className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 lowercase"
               disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
             >
-              <Save className="mr-2 h-6 w-6" /> salvar treino atual
+              <Save className="mr-2 h-6 w-6" /> save current workout
             </Button>
           </div>
         </div>
@@ -227,9 +227,9 @@ export default function HomePage() {
       {!currentWorkout.type && (
          <Alert className="my-8 border-accent bg-card shadow-md">
            <Info className="h-5 w-5 text-accent" />
-           <AlertTitle className="font-headline text-accent text-xl">bem-vindo ao kinetic tracker!</AlertTitle>
-           <AlertDescription className="text-muted-foreground text-base">
-             selecione 'push day' ou 'pull day' acima para comecar a registrar seus exercicios. seu progresso sera salvo na nuvem!
+           <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to kinetic tracker!</AlertTitle>
+           <AlertDescription className="text-muted-foreground text-base lowercase">
+             select 'push day' or 'pull day' above to start logging your exercises. your progress will be saved to the cloud!
            </AlertDescription>
          </Alert>
       )}
@@ -248,9 +248,9 @@ export default function HomePage() {
       {currentWorkout.type && currentWorkout.exercises.length === 0 && (
           <Alert variant="destructive" className="my-8">
             <AlertTriangle className="h-5 w-5" />
-            <AlertTitle className="font-headline">nenhum exercicio carregado</AlertTitle>
-            <AlertDescription>
-              pode haver um problema ao carregar os exercicios para o dia de {currentWorkout.type}. por favor, tente selecionar o dia novamente.
+            <AlertTitle className="font-headline lowercase">no exercises loaded</AlertTitle>
+            <AlertDescription className="lowercase">
+              there might be an issue loading exercises for {currentWorkout.type} day. please try selecting the day again.
             </AlertDescription>
           </Alert>
       )}
@@ -258,7 +258,7 @@ export default function HomePage() {
       <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} isLoading={isLoadingHistory} />
       
       <footer className="text-center mt-12 py-6 border-t border-border">
-        <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} kinetic tracker. continue pushing, continue pulling!</p>
+        <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} kinetic tracker. keep pushing, keep pulling!</p>
       </footer>
     </div>
   );

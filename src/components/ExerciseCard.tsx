@@ -3,10 +3,9 @@
 
 import { useState } from 'react';
 import type { ExerciseLogEntry, SetData } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { QuickSetLoggerDialog } from './QuickSetLoggerDialog';
 
 interface ExerciseCardProps {
@@ -52,20 +51,20 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
               aria-expanded={activeAccordionItem === "sets"}
               aria-controls={setsContentId}
               disabled={exerciseLog.sets.length === 0}
-              aria-label={`expandir series para ${exerciseLog.exerciseName}`}
+              aria-label={`expand sets for ${exerciseLog.exerciseName}`}
             >
               {exerciseLog.sets.length}
             </button>
           </div>
           
-          <Button 
-            variant="ghost" 
-            onClick={() => setIsQuickSetLoggerOpen(true)} 
-            className="text-primary hover:text-accent-foreground hover:bg-accent text-lg lowercase"
-            aria-label={`add set para ${exerciseLog.exerciseName}`}
+          <button
+            type="button"
+            onClick={() => setIsQuickSetLoggerOpen(true)}
+            className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`add set for ${exerciseLog.exerciseName}`}
           >
-            <PlusCircle className="mr-2 h-5 w-5" /> add set
-          </Button>
+            add set
+          </button>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -87,15 +86,14 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
                           set {index + 1}: <span className="font-semibold text-primary">{set.reps} reps</span>
                           {set.weight && ` at ${set.weight} kg`}
                         </p>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <button
+                          type="button" 
                           onClick={() => onDeleteSet(exerciseLog.exerciseId, set.id)} 
-                          className="text-destructive hover:text-red-400 h-8 w-8"
-                          aria-label={`deletar set ${index + 1} para ${exerciseLog.exerciseName}`}
+                          className="text-destructive hover:text-red-400 h-8 w-8 p-0 bg-transparent border-none flex items-center justify-center focus:outline-none focus-visible:ring-1 focus-visible:ring-destructive rounded-md"
+                          aria-label={`delete set ${index + 1} for ${exerciseLog.exerciseName}`}
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </button>
                       </div>
                     </li>
                   ))}
@@ -104,7 +102,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
             </AccordionItem>
           </Accordion>
         ) : (
-           <p className="text-muted-foreground text-center py-4 lowercase">nenhuma serie registrada ainda. clique em 'add set' para comecar!</p>
+           <p className="text-muted-foreground text-center py-4 lowercase">no sets logged yet. click 'add set' to start!</p>
         )}
       </CardContent>
 

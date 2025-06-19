@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import type { ExerciseLogEntry, SetData } from '@/types';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +16,7 @@ interface QuickSetLoggerDialogProps {
   exerciseName: string;
 }
 
-export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseName }: QuickSetLoggerDialogProps) {
+export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet }: QuickSetLoggerDialogProps) {
   const [reps, setReps] = useState<number>(8); 
 
   const repOptions = Array.from({ length: 30 }, (_, i) => i + 1); 
@@ -49,7 +48,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
                 onValueChange={handleRepSelection}
               >
                 <SelectTrigger id="reps-select" className="h-12 text-lg w-full">
-                  <SelectValue placeholder="selecione" />
+                  <SelectValue placeholder="select" />
                 </SelectTrigger>
                 <SelectContent>
                   {repOptions.map(r => (
