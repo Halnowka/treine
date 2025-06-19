@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -13,31 +14,60 @@ import { Save, AlertTriangle, Info, Edit3 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { db } from '@/lib/firebase'; // Firebase import
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp } from "firebase/firestore";
+import { parseISO } from 'date-fns';
 
-const LOCAL_STORAGE_KEY_WORKOUTS = 'kineticTrackerWorkouts';
+
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
 
 export default function HomePage() {
   const [currentWorkout, setCurrentWorkout] = useState<CurrentWorkout>({ type: null, exercises: [], workoutNotes: '' });
   const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
-    const storedWorkouts = localStorage.getItem(LOCAL_STORAGE_KEY_WORKOUTS);
-    if (storedWorkouts) {
-      setSavedWorkouts(JSON.parse(storedWorkouts));
-    }
+    // Load current workout from localStorage
     const storedCurrentWorkout = localStorage.getItem(LOCAL_STORAGE_KEY_CURRENT_WORKOUT);
     if (storedCurrentWorkout) {
       setCurrentWorkout(JSON.parse(storedCurrentWorkout));
     } else {
       setCurrentWorkout({ type: null, exercises: [], workoutNotes: '' });
     }
-  }, []);
 
-  useEffect(() => {
+    // Fetch saved workouts from Firestore
+    const fetchWorkouts = async () => {
+      setIsLoadingHistory(true);
+      try {
+        const workoutsCol = collection(db, 'workouts');
+        const q = query(workoutsCol, orderBy('date', 'desc'));
+        const workoutSnapshot = await getDocs(q);
+        const workoutList = workoutSnapshot.docs.map(docSnap => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            type: data.type as WorkoutType,
+            exercises: data.exercises as ExerciseLogEntry[],
+            workoutNotes: data.workoutNotes as string | undefined,
+            date: (data.date as Timestamp).toDate().toISOString(),
+          } as SavedWorkout;
+        });
+        setSavedWorkouts(workoutList);
+      } catch (error) {
+        console.error("Error fetching workouts: ", error);
+        toast({ title: "Erro ao Carregar Histórico", description: "Não foi possível carregar o histórico de treinos do banco de dados.", variant: "destructive" });
+      }
+      setIsLoadingHistory(false);
+    };
+
+    fetchWorkouts();
+
+  }, [toast]); // Removed isClient from here as fetch should run once on mount if client
+
+   useEffect(() => {
     if (isClient) {
       localStorage.setItem(LOCAL_STORAGE_KEY_CURRENT_WORKOUT, JSON.stringify(currentWorkout));
     }
@@ -45,11 +75,11 @@ export default function HomePage() {
 
   const handleSelectDay = useCallback((day: WorkoutType) => {
     if (currentWorkout.type === day && currentWorkout.exercises.length > 0) {
-      toast({ title: "Workout Resumed", description: `Continuing with your ${day} day workout.` });
+      toast({ title: "Treino Retomado", description: `Continuando com seu treino de ${day}.` });
       return;
     }
     if (currentWorkout.exercises.some(ex => ex.sets.length > 0) || (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '')) {
-        if (!confirm("You have unsaved progress. Switching workout type will clear it. Continue?")) {
+        if (!confirm("Você tem progresso não salvo. Mudar o tipo de treino irá limpá-lo. Continuar?")) {
             return;
         }
     }
@@ -62,9 +92,9 @@ export default function HomePage() {
         exerciseName: ex.name,
         sets: [],
       })),
-      workoutNotes: '', // Reset workout notes when starting a new day
+      workoutNotes: '',
     });
-    toast({ title: "Workout Started", description: `Selected ${day} day. Let's get to it!` });
+    toast({ title: "Treino Iniciado", description: `Selecionado dia de ${day}. Vamos nessa!` });
   }, [currentWorkout, toast]);
 
   const handleUpdateExerciseLog = useCallback((updatedLog: ExerciseLogEntry) => {
@@ -85,7 +115,7 @@ export default function HomePage() {
           : ex
       ),
     }));
-    toast({ title: "Set Deleted", variant: "destructive" });
+    toast({ title: "Série Deletada", variant: "destructive" });
   }, [toast]);
 
   const handleWorkoutNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -95,55 +125,71 @@ export default function HomePage() {
     }));
   };
 
-  const handleSaveWorkout = useCallback(() => {
+  const handleSaveWorkout = useCallback(async () => {
     if (!currentWorkout.type || currentWorkout.exercises.every(ex => ex.sets.length === 0)) {
       toast({
-        title: "Cannot Save Workout",
-        description: "Please select a workout type and log at least one set for an exercise.",
+        title: "Não é Possível Salvar o Treino",
+        description: "Por favor, selecione um tipo de treino e registre pelo menos uma série para um exercício.",
         variant: "destructive",
       });
       return;
     }
 
-    const newSavedWorkout: SavedWorkout = {
-      id: crypto.randomUUID(),
-      date: new Date().toISOString(),
-      type: currentWorkout.type,
-      exercises: currentWorkout.exercises.filter(ex => ex.sets.length > 0),
-      workoutNotes: currentWorkout.workoutNotes,
+    const workoutToSaveToFirestore = {
+        type: currentWorkout.type,
+        exercises: currentWorkout.exercises.filter(ex => ex.sets.length > 0),
+        workoutNotes: currentWorkout.workoutNotes || '',
+        date: Timestamp.fromDate(new Date()),
     };
 
-    const updatedSavedWorkouts = [...savedWorkouts, newSavedWorkout];
-    setSavedWorkouts(updatedSavedWorkouts);
-    if (isClient) {
-      localStorage.setItem(LOCAL_STORAGE_KEY_WORKOUTS, JSON.stringify(updatedSavedWorkouts));
+    try {
+        const docRef = await addDoc(collection(db, "workouts"), workoutToSaveToFirestore);
+        
+        const newSavedWorkout: SavedWorkout = {
+            id: docRef.id,
+            date: workoutToSaveToFirestore.date.toDate().toISOString(),
+            type: workoutToSaveToFirestore.type,
+            exercises: workoutToSaveToFirestore.exercises,
+            workoutNotes: workoutToSaveToFirestore.workoutNotes,
+        };
+
+        setSavedWorkouts(prevSavedWorkouts => 
+            [newSavedWorkout, ...prevSavedWorkouts].sort((a,b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
+        );
+        
+        setCurrentWorkout({ type: null, exercises: [], workoutNotes: '' });
+        // No need to touch localStorage for saved workouts here
+        if (isClient) {
+             localStorage.removeItem(LOCAL_STORAGE_KEY_CURRENT_WORKOUT);
+        }
+
+        toast({
+          title: "Treino Salvo!",
+          description: `Seu treino de ${currentWorkout.type.toUpperCase()} foi salvo com sucesso no banco de dados.`,
+        });
+    } catch (error) {
+        console.error("Error saving workout: ", error);
+        toast({ title: "Erro ao Salvar", description: "Não foi possível salvar o treino no banco de dados.", variant: "destructive" });
     }
+  }, [currentWorkout, toast, isClient]);
 
-    setCurrentWorkout({ type: null, exercises: [], workoutNotes: '' });
-    if (isClient) {
-        localStorage.removeItem(LOCAL_STORAGE_KEY_CURRENT_WORKOUT);
+  const handleDeleteWorkout = useCallback(async (workoutId: string) => {
+    try {
+        await deleteDoc(doc(db, 'workouts', workoutId));
+        setSavedWorkouts(prev => prev.filter(w => w.id !== workoutId));
+        toast({ title: "Treino Deletado", description: "O treino foi removido do seu histórico.", variant: "destructive" });
+    } catch (error) {
+        console.error("Error deleting workout: ", error);
+        toast({ title: "Erro ao Deletar", description: "Não foi possível deletar o treino do banco de dados.", variant: "destructive"});
     }
+  }, [toast]);
 
-    toast({
-      title: "Workout Saved!",
-      description: `${currentWorkout.type.toUpperCase()} day workout has been successfully saved.`,
-    });
-  }, [currentWorkout, savedWorkouts, toast, isClient]);
-
-  const handleDeleteWorkout = useCallback((workoutId: string) => {
-    const updatedSavedWorkouts = savedWorkouts.filter(w => w.id !== workoutId);
-    setSavedWorkouts(updatedSavedWorkouts);
-    if (isClient) {
-      localStorage.setItem(LOCAL_STORAGE_KEY_WORKOUTS, JSON.stringify(updatedSavedWorkouts));
-    }
-    toast({ title: "Workout Deleted", description: "The workout has been removed from your history.", variant: "destructive" });
-  }, [savedWorkouts, toast, isClient]);
-
-  if (!isClient) {
+  if (!isClient || isLoadingHistory) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
         <Header />
-        <p className="text-xl text-primary">Loading Kinetic Tracker...</p>
+        <p className="text-xl text-primary">Carregando Kinetic Tracker...</p>
+        {isLoadingHistory && <p className="text-md text-muted-foreground">Acessando histórico de treinos...</p>}
       </div>
     );
   }
@@ -158,7 +204,7 @@ export default function HomePage() {
           <div className="max-w-xl mx-auto">
             <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center">
               <Edit3 className="mr-2 h-5 w-5" />
-              Anotações do Treino ({currentWorkout.type} Day)
+              Anotações do Treino ({currentWorkout.type.toUpperCase()} Day)
             </Label>
             <Textarea
               id="workoutNotes"
@@ -173,7 +219,7 @@ export default function HomePage() {
               onClick={handleSaveWorkout} 
               size="lg" 
               className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
-              disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0)}
+              disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
             >
               <Save className="mr-2 h-6 w-6" /> Salvar Treino Atual
             </Button>
@@ -186,7 +232,7 @@ export default function HomePage() {
            <Info className="h-5 w-5 text-accent" />
            <AlertTitle className="font-headline text-accent text-xl">Bem-vindo ao Kinetic Tracker!</AlertTitle>
            <AlertDescription className="text-muted-foreground text-base">
-             Selecione 'Push Day' ou 'Pull Day' acima para começar a registrar seus exercícios. Seu progresso será salvo automaticamente.
+             Selecione 'Push Day' ou 'Pull Day' acima para começar a registrar seus exercícios. Seu progresso será salvo na nuvem!
            </AlertDescription>
          </Alert>
       )}
@@ -212,7 +258,7 @@ export default function HomePage() {
           </Alert>
       )}
 
-      <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} />
+      <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} isLoading={isLoadingHistory} />
       
       <footer className="text-center mt-12 py-6 border-t border-border">
         <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} Kinetic Tracker. Continue Pushing, Continue Pulling!</p>
