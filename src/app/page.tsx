@@ -77,7 +77,7 @@ export default function HomePage() {
       return;
     }
     if (currentWorkout.exercises.some(ex => ex.sets.length > 0) || (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '')) {
-        if (!confirm("you have unsaved progress. changing workout type will clear it. continue?")) {
+        if (!confirm("you have unsaved progress (sets or notes). changing workout type will clear it. continue?")) {
             return;
         }
     }
@@ -263,3 +263,4 @@ export default function HomePage() {
     </div>
   );
 }
+
