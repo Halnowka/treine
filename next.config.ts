@@ -4,7 +4,7 @@ import type {NextConfig} from 'next';
 // IMPORTANT: Replace 'your-repo-name' with the actual name of your GitHub repository
 // If your GitHub Pages site is at the root (e.g., username.github.io),
 // then set basePath to '' and assetPrefix to '/'.
-const repoName = 'your-repo-name'; // <<<<====== CHANGE THIS
+const repoName = 'calistenia'; // <<<<====== UPDATED WITH YOUR REPO NAME
 
 const nextConfig: NextConfig = {
   output: 'export', // Enables static HTML export
