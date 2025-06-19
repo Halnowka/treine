@@ -1,7 +1,7 @@
 import type {Config} from 'tailwindcss';
 
 export default {
-  darkMode: ['class'],
+  darkMode: ['class'], // Ensure dark mode is class-based
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,9 +10,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        // Set Inter as the primary font for body and headline
         body: ['Inter', 'sans-serif'],
         headline: ['Inter', 'sans-serif'],
-        code: ['monospace'],
+        code: ['monospace'], // Default monospace font for code
       },
       colors: {
         background: 'hsl(var(--background))',
