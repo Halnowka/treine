@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -98,9 +97,9 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
                       {format(parseISO(workout.date), "MMMM d, yyyy 'at' h:mm a")}
                     </CardDescription>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-4">
                     { (workout.workoutNotes && workout.workoutNotes.trim() !== "" || workout.exercises.length > 0) && (
-                        isExpanded ? <ChevronUp className="h-6 w-6 text-primary mr-2" /> : <ChevronDown className="h-6 w-6 text-primary mr-2" />
+                        isExpanded ? <ChevronUp className="h-6 w-6 text-primary" /> : <ChevronDown className="h-6 w-6 text-primary" />
                     )}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -205,5 +204,3 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
     </div>
   );
 }
-
-    
