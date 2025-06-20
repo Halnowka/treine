@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -138,19 +137,27 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
                         logged exercises ({workout.exercises.length}):
                       </h4>
                       <ul className="space-y-3">
-                        {workout.exercises.map((exerciseLog) => (
-                          <li key={exerciseLog.exerciseId} className="p-3 bg-muted/50 rounded-md border border-border/50">
-                            <h5 className="font-semibold text-primary text-lg lowercase">{exerciseLog.exerciseName}</h5>
-                            <ul className="space-y-1 mt-1 pl-4 list-disc list-inside text-sm lowercase">
-                              {exerciseLog.sets.map((set, idx) => (
-                                <li key={set.id}>
-                                  set {idx + 1}: {set.reps} reps
-                                  {set.weight && ` at ${set.weight} kg`}
-                                </li>
-                              ))}
-                            </ul>
-                          </li>
-                        ))}
+                        {workout.exercises.map((exerciseLog) => {
+                          const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
+                          return (
+                            <li key={exerciseLog.exerciseId} className="p-3 bg-muted/50 rounded-md border border-border/50">
+                              <h5 className="font-semibold text-primary text-lg lowercase">{exerciseLog.exerciseName}</h5>
+                              <ul className="space-y-1 mt-1 pl-4 list-disc list-inside text-sm lowercase">
+                                {exerciseLog.sets.map((set, idx) => (
+                                  <li key={set.id}>
+                                    set {idx + 1}: {set.reps} reps
+                                    {set.weight && ` at ${set.weight} kg`}
+                                  </li>
+                                ))}
+                              </ul>
+                              {totalReps > 0 && (
+                                <p className="text-xs text-muted-foreground text-right mt-1 lowercase">
+                                  total: {totalReps} reps
+                                </p>
+                              )}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   )}
@@ -166,4 +173,3 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
     </div>
   );
 }
-

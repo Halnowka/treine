@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -35,6 +34,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   };
   
   const setsContentId = `sets-content-${exerciseLog.exerciseId}`;
+  const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
@@ -99,6 +99,11 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
                     </li>
                   ))}
                 </ul>
+                {totalReps > 0 && (
+                  <p className="text-xs text-muted-foreground text-right mt-2 lowercase">
+                    total: {totalReps} reps
+                  </p>
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
