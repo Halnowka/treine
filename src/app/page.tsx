@@ -138,10 +138,26 @@ export default function HomePage() {
       });
       return;
     }
+    
+    const sanitizedExercises = currentWorkout.exercises
+      .filter(ex => ex.sets.length > 0)
+      .map(ex => ({
+        ...ex,
+        sets: ex.sets.map(set => {
+          const cleanSet: { id: string; reps: number; weight?: number } = {
+            id: set.id,
+            reps: set.reps,
+          };
+          if (typeof set.weight === 'number' && !isNaN(set.weight)) {
+            cleanSet.weight = set.weight;
+          }
+          return cleanSet;
+        }),
+      }));
 
     const workoutToSaveToFirestore = {
         type: currentWorkout.type,
-        exercises: currentWorkout.exercises.filter(ex => ex.sets.length > 0),
+        exercises: sanitizedExercises,
         workoutNotes: currentWorkout.workoutNotes || '',
         date: Timestamp.fromDate(new Date()),
     };
@@ -152,7 +168,7 @@ export default function HomePage() {
         const newSavedWorkout: SavedWorkout = {
             id: docRef.id,
             date: workoutToSaveToFirestore.date.toDate().toISOString(),
-            type: workoutToSaveToFirestore.type,
+            type: workoutToSaveToFirestore.type!,
             exercises: workoutToSaveToFirestore.exercises,
             workoutNotes: workoutToSaveToFirestore.workoutNotes,
         };
