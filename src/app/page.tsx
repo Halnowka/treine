@@ -207,7 +207,7 @@ export default function HomePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
         <Header />
-        <p className="text-xl text-primary lowercase">loading kinetic tracker...</p>
+        <p className="text-xl text-primary lowercase">loading treine...</p>
         {isLoadingHistory && <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>}
       </div>
     );
@@ -221,7 +221,7 @@ export default function HomePage() {
       {!currentWorkout.type && (
          <Alert className="my-8 border-accent bg-card shadow-md">
            <Info className="h-5 w-5 text-accent" />
-           <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to kinetic tracker!</AlertTitle>
+           <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to treine!</AlertTitle>
            <AlertDescription className="text-muted-foreground text-base lowercase">
              select 'push day' or 'pull day' above to start logging your exercises. your progress will be saved to the cloud!
            </AlertDescription>
@@ -280,7 +280,7 @@ export default function HomePage() {
       <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} isLoading={isLoadingHistory} />
       
       <footer className="text-center mt-12 py-6 border-t border-border">
-        <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} kinetic tracker. keep pushing, keep pulling!</p>
+        <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
       </footer>
     </div>
   );
