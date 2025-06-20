@@ -4,7 +4,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'kinetic tracker',
+  title: 'TREINE',
   description: 'track your push and pull day workouts.',
 };
 

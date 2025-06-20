@@ -15,7 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
 import { parseISO } from 'date-fns';
 
 
@@ -138,10 +138,26 @@ export default function HomePage() {
       });
       return;
     }
+    
+    const sanitizedExercises = currentWorkout.exercises
+      .filter(ex => ex.sets.length > 0)
+      .map(ex => ({
+        ...ex,
+        sets: ex.sets.map(set => {
+          const cleanSet: { id: string; reps: number; weight?: number } = {
+            id: set.id,
+            reps: set.reps,
+          };
+          if (typeof set.weight === 'number' && !isNaN(set.weight)) {
+            cleanSet.weight = set.weight;
+          }
+          return cleanSet;
+        }),
+      }));
 
     const workoutToSaveToFirestore = {
         type: currentWorkout.type,
-        exercises: currentWorkout.exercises.filter(ex => ex.sets.length > 0),
+        exercises: sanitizedExercises,
         workoutNotes: currentWorkout.workoutNotes || '',
         date: Timestamp.fromDate(new Date()),
     };
@@ -152,7 +168,7 @@ export default function HomePage() {
         const newSavedWorkout: SavedWorkout = {
             id: docRef.id,
             date: workoutToSaveToFirestore.date.toDate().toISOString(),
-            type: workoutToSaveToFirestore.type,
+            type: workoutToSaveToFirestore.type!,
             exercises: workoutToSaveToFirestore.exercises,
             workoutNotes: workoutToSaveToFirestore.workoutNotes,
         };
@@ -186,12 +202,28 @@ export default function HomePage() {
         toast({ title: "error deleting workout", description: "could not delete workout from the database.", variant: "destructive"});
     }
   }, [toast]);
+  
+  const handleUpdateWorkoutNotes = useCallback(async (workoutId: string, newNotes: string) => {
+    try {
+        const workoutRef = doc(db, 'workouts', workoutId);
+        await updateDoc(workoutRef, {
+            workoutNotes: newNotes
+        });
+        setSavedWorkouts(prev => prev.map(w => 
+            w.id === workoutId ? { ...w, workoutNotes: newNotes } : w
+        ));
+        toast({ title: "notes updated", description: "your workout notes have been successfully updated." });
+    } catch (error) {
+        console.error("error updating notes: ", error);
+        toast({ title: "error updating notes", description: "could not update notes in the database.", variant: "destructive"});
+    }
+  }, [toast]);
 
   if (!isClient || isLoadingHistory) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
         <Header />
-        <p className="text-xl text-primary lowercase">loading kinetic tracker...</p>
+        <p className="text-xl text-primary lowercase">loading treine...</p>
         {isLoadingHistory && <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>}
       </div>
     );
@@ -205,7 +237,7 @@ export default function HomePage() {
       {!currentWorkout.type && (
          <Alert className="my-8 border-accent bg-card shadow-md">
            <Info className="h-5 w-5 text-accent" />
-           <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to kinetic tracker!</AlertTitle>
+           <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to treine!</AlertTitle>
            <AlertDescription className="text-muted-foreground text-base lowercase">
              select 'push day' or 'pull day' above to start logging your exercises. your progress will be saved to the cloud!
            </AlertDescription>
@@ -261,11 +293,18 @@ export default function HomePage() {
         </div>
       )}
 
-      <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} isLoading={isLoadingHistory} />
+      <WorkoutHistory 
+        savedWorkouts={savedWorkouts} 
+        onDeleteWorkout={handleDeleteWorkout} 
+        onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
+        isLoading={isLoadingHistory} 
+      />
       
       <footer className="text-center mt-12 py-6 border-t border-border">
-        <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} kinetic tracker. keep pushing, keep pulling!</p>
+        <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
       </footer>
     </div>
   );
 }
+
+    

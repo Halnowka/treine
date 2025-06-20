@@ -5,7 +5,7 @@ import * as React from 'react';
 import type { SavedWorkout } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarDays, Trash2, Dumbbell, ListChecks, StickyNote, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { CalendarDays, Trash2, Dumbbell, ListChecks, StickyNote, Loader2, ChevronDown, ChevronUp, Edit3 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import {
   AlertDialog,
@@ -18,18 +18,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Textarea } from './ui/textarea';
 
 interface WorkoutHistoryProps {
   savedWorkouts: SavedWorkout[];
   onDeleteWorkout: (workoutId: string) => void;
+  onUpdateWorkoutNotes: (workoutId: string, newNotes: string) => void;
   isLoading: boolean;
 }
 
-export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: WorkoutHistoryProps) {
+export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkoutNotes, isLoading }: WorkoutHistoryProps) {
   const [activeWorkoutId, setActiveWorkoutId] = React.useState<string | null>(null);
   const [workoutToDeleteId, setWorkoutToDeleteId] = React.useState<string | null>(null);
+  const [editingWorkout, setEditingWorkout] = React.useState<{ id: string; notes: string } | null>(null);
 
   const toggleWorkoutExpansion = (workoutId: string) => {
+    if (editingWorkout?.id === workoutId) return; // Prevent collapsing while editing
     setActiveWorkoutId(prevId => (prevId === workoutId ? null : workoutId));
   };
 
@@ -43,6 +47,13 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
   const openDeleteDialog = (workoutId: string, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent card from toggling expansion
     setWorkoutToDeleteId(workoutId);
+  };
+  
+  const handleSaveNotes = () => {
+    if (editingWorkout) {
+        onUpdateWorkoutNotes(editingWorkout.id, editingWorkout.notes);
+        setEditingWorkout(null);
+    }
   };
 
   if (isLoading) {
@@ -122,40 +133,68 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
                 </div>
               </CardHeader>
               {isExpanded && (
-                <CardContent className="pt-2 pb-4">
-                  {workout.workoutNotes && workout.workoutNotes.trim() !== "" && (
-                    <div className="mb-4 p-3 bg-muted/30 rounded-md border border-border/30">
-                      <h4 className="font-semibold text-accent text-md flex items-center mb-1 lowercase">
-                        <StickyNote className="mr-2 h-5 w-5" />
-                        workout notes:
-                      </h4>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{workout.workoutNotes}</p>
-                    </div>
-                  )}
+                <CardContent className="pt-2 pb-4 space-y-4">
+                  <div className="p-3 bg-muted/30 rounded-md border border-border/30">
+                      <div className="flex justify-between items-center mb-1">
+                          <h4 className="font-semibold text-accent text-md flex items-center lowercase">
+                              <StickyNote className="mr-2 h-5 w-5" />
+                              workout notes
+                          </h4>
+                          {editingWorkout?.id !== workout.id && (
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => setEditingWorkout({ id: workout.id, notes: workout.workoutNotes || '' })}>
+                                  <Edit3 className="h-4 w-4" />
+                              </Button>
+                          )}
+                      </div>
+                      
+                      {editingWorkout?.id === workout.id ? (
+                          <div className="space-y-2 mt-2">
+                              <Textarea
+                                  placeholder="add or edit your notes..."
+                                  value={editingWorkout.notes}
+                                  onChange={(e) => setEditingWorkout(prev => prev ? { ...prev, notes: e.target.value } : null)}
+                                  className="min-h-[100px] text-base bg-card border-input"
+                              />
+                              <div className="flex justify-end gap-2">
+                                  <Button variant="ghost" onClick={() => setEditingWorkout(null)} className="lowercase">cancel</Button>
+                                  <Button onClick={handleSaveNotes} className="lowercase">save</Button>
+                              </div>
+                          </div>
+                      ) : (
+                          (workout.workoutNotes && workout.workoutNotes.trim() !== "") ? (
+                               <p className="text-sm text-muted-foreground whitespace-pre-wrap mt-2">{workout.workoutNotes}</p>
+                          ) : (
+                              <p className="text-sm text-muted-foreground italic mt-2">no notes recorded.</p>
+                          )
+                      )}
+                  </div>
+
                   {workout.exercises.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-accent text-md mb-2 lowercase">
-                        logged exercises ({workout.exercises.length}):
-                      </h4>
                       <ul className="space-y-3">
-                        {workout.exercises.map((exerciseLog) => (
-                          <li key={exerciseLog.exerciseId} className="p-3 bg-muted/50 rounded-md border border-border/50">
-                            <h5 className="font-semibold text-primary text-lg lowercase">{exerciseLog.exerciseName}</h5>
-                            <ul className="space-y-1 mt-1 pl-4 list-disc list-inside text-sm lowercase">
-                              {exerciseLog.sets.map((set, idx) => (
-                                <li key={set.id}>
-                                  set {idx + 1}: {set.reps} reps
-                                  {set.weight && ` at ${set.weight} kg`}
-                                </li>
-                              ))}
-                            </ul>
-                          </li>
-                        ))}
+                        {workout.exercises.map((exerciseLog) => {
+                          const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
+                          return (
+                            <li key={exerciseLog.exerciseId} className="p-3 bg-muted/50 rounded-md border border-border/50">
+                              <h5 className="font-semibold text-primary text-lg lowercase">{exerciseLog.exerciseName}</h5>
+                              <ul className="space-y-1 mt-1 pl-4 list-disc list-inside text-sm lowercase">
+                                {exerciseLog.sets.map((set, idx) => (
+                                  <li key={set.id}>
+                                    set {idx + 1}: {set.reps} reps
+                                    {set.weight && ` at ${set.weight} kg`}
+                                  </li>
+                                ))}
+                              </ul>
+                              {totalReps > 0 && (
+                                <p className="text-xs text-muted-foreground text-right mt-1 lowercase">
+                                  total: {totalReps} reps
+                                </p>
+                              )}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
-                  )}
-                  {(!workout.workoutNotes || workout.workoutNotes.trim() === "") && workout.exercises.length === 0 && (
-                     <p className="text-sm text-muted-foreground lowercase">no details recorded for this workout.</p>
                   )}
                 </CardContent>
               )}
@@ -167,3 +206,4 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, isLoading }: Wo
   );
 }
 
+    
