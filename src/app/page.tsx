@@ -15,7 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
 import { parseISO } from 'date-fns';
 
 
@@ -202,6 +202,22 @@ export default function HomePage() {
         toast({ title: "error deleting workout", description: "could not delete workout from the database.", variant: "destructive"});
     }
   }, [toast]);
+  
+  const handleUpdateWorkoutNotes = useCallback(async (workoutId: string, newNotes: string) => {
+    try {
+        const workoutRef = doc(db, 'workouts', workoutId);
+        await updateDoc(workoutRef, {
+            workoutNotes: newNotes
+        });
+        setSavedWorkouts(prev => prev.map(w => 
+            w.id === workoutId ? { ...w, workoutNotes: newNotes } : w
+        ));
+        toast({ title: "notes updated", description: "your workout notes have been successfully updated." });
+    } catch (error) {
+        console.error("error updating notes: ", error);
+        toast({ title: "error updating notes", description: "could not update notes in the database.", variant: "destructive"});
+    }
+  }, [toast]);
 
   if (!isClient || isLoadingHistory) {
     return (
@@ -277,7 +293,12 @@ export default function HomePage() {
         </div>
       )}
 
-      <WorkoutHistory savedWorkouts={savedWorkouts} onDeleteWorkout={handleDeleteWorkout} isLoading={isLoadingHistory} />
+      <WorkoutHistory 
+        savedWorkouts={savedWorkouts} 
+        onDeleteWorkout={handleDeleteWorkout} 
+        onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
+        isLoading={isLoadingHistory} 
+      />
       
       <footer className="text-center mt-12 py-6 border-t border-border">
         <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
@@ -285,3 +306,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
