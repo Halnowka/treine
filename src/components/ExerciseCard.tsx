@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -39,7 +40,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
-        <div className="grid grid-cols-3 items-center">
+        <div className="grid grid-cols-3 items-baseline">
           <div className="text-lg font-headline text-primary lowercase justify-self-start truncate">
             {exerciseLog.exerciseName}
           </div>
