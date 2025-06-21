@@ -39,34 +39,36 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
-      <CardHeader className="pb-3">
-        <div className="grid grid-cols-3 items-baseline">
-          <div className="text-lg font-headline text-primary lowercase justify-self-start truncate">
+      <CardHeader className="p-6 pb-3">
+        <div className="relative flex h-12 items-baseline justify-between">
+          <div className="text-lg font-headline text-primary lowercase truncate">
             {exerciseLog.exerciseName}
           </div>
-          
-          <button
-            type="button"
-            onClick={toggleAccordion}
-            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center align-self-stretch relative"
-            aria-expanded={activeAccordionItem === "sets"}
-            aria-controls={setsContentId}
-            disabled={exerciseLog.sets.length === 0}
-            aria-label={`expand sets for ${exerciseLog.exerciseName}`}
-          >
-            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                {exerciseLog.sets.length}
-            </span>
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => setIsQuickSetLoggerOpen(true)}
-            className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring justify-self-end"
-            aria-label={`add set for ${exerciseLog.exerciseName}`}
-          >
-            add set
-          </button>
+
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <button
+              type="button"
+              onClick={toggleAccordion}
+              className="text-3xl font-bold text-primary cursor-pointer focus:outline-none rounded-md focus-visible:ring-2 focus-visible:ring-ring flex h-12 w-12 items-center justify-center"
+              aria-expanded={activeAccordionItem === "sets"}
+              aria-controls={setsContentId}
+              disabled={exerciseLog.sets.length === 0}
+              aria-label={`expand sets for ${exerciseLog.exerciseName}`}
+            >
+              {exerciseLog.sets.length}
+            </button>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              onClick={() => setIsQuickSetLoggerOpen(true)}
+              className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={`add set for ${exerciseLog.exerciseName}`}
+            >
+              add set
+            </button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
