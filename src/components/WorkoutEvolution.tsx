@@ -98,6 +98,7 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                 <AreaChart
                   accessibilityLayer
                   data={evolutionData}
+                  margin={{ left: -30, right: 30 }}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
