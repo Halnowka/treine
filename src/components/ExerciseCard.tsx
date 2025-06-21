@@ -48,13 +48,15 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
           <button
             type="button"
             onClick={toggleAccordion}
-            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center align-self-stretch flex items-center justify-center"
+            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center align-self-stretch relative"
             aria-expanded={activeAccordionItem === "sets"}
             aria-controls={setsContentId}
             disabled={exerciseLog.sets.length === 0}
             aria-label={`expand sets for ${exerciseLog.exerciseName}`}
           >
-            {exerciseLog.sets.length}
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                {exerciseLog.sets.length}
+            </span>
           </button>
           
           <button
