@@ -39,9 +39,8 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
-      <CardHeader className="p-4">
-        <div className="relative flex items-center">
-          <div className="flex w-full items-center justify-between">
+      <CardHeader className="px-4 pt-5 pb-3 relative">
+        <div className="flex justify-between items-center w-full">
             <div className="text-lg font-headline text-primary lowercase truncate">
               {exerciseLog.exerciseName}
             </div>
@@ -53,9 +52,9 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
             >
               add set
             </button>
-          </div>
+        </div>
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <button
               type="button"
               onClick={toggleAccordion}
@@ -67,7 +66,6 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
             >
               {exerciseLog.sets.length}
             </button>
-          </div>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
