@@ -40,7 +40,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
-        <div className="grid grid-cols-3 items-center">
+        <div className="grid grid-cols-3 items-baseline">
           <div className="text-lg font-headline text-primary lowercase justify-self-start truncate">
             {exerciseLog.exerciseName}
           </div>
@@ -48,7 +48,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
           <button
             type="button"
             onClick={toggleAccordion}
-            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none p-2 -m-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center flex items-center justify-center"
+            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none p-2 -m-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center align-self-center"
             aria-expanded={activeAccordionItem === "sets"}
             aria-controls={setsContentId}
             disabled={exerciseLog.sets.length === 0}
