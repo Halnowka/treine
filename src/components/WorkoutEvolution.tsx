@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { SavedWorkout } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
@@ -42,24 +42,34 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
   const evolutionData = React.useMemo(() => {
     if (!selectedExercise) return [];
 
-    return savedWorkouts
-      .map(workout => {
-        const exerciseLog = workout.exercises.find(ex => ex.exerciseName === selectedExercise);
-        if (!exerciseLog) return null;
+    const dailyTotals: Record<string, number> = {};
 
+    // 1. Group workouts by day and sum total reps for the selected exercise
+    savedWorkouts.forEach(workout => {
+      const exerciseLog = workout.exercises.find(ex => ex.exerciseName === selectedExercise);
+      if (exerciseLog && exerciseLog.sets.length > 0) {
+        const dateKey = format(parseISO(workout.date), 'yyyy-MM-dd'); // Use a consistent key for grouping
         const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
-        return {
-          date: workout.date,
-          totalReps,
-        };
-      })
-      .filter((item): item is ChartData => item !== null && item.totalReps > 0)
+        if (totalReps > 0) {
+          dailyTotals[dateKey] = (dailyTotals[dateKey] || 0) + totalReps;
+        }
+      }
+    });
+
+    // 2. Convert the grouped data into an array for the chart
+    return Object.entries(dailyTotals)
+      .map(([date, totalReps]) => ({
+        date,
+        totalReps,
+      }))
       .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
       .map(item => ({
         ...item,
-        date: format(parseISO(item.date), "d MMM"),
+        date: format(parseISO(item.date), "d MMM"), // Format date for display
       }));
+
   }, [selectedExercise, savedWorkouts]);
+
 
   if (savedWorkouts.length === 0 || uniqueExercises.length === 0) {
     return null;
@@ -115,7 +125,7 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                     cursor={false}
                     content={<ChartTooltipContent 
                         indicator="dot" 
-                        formatter={(value, name) => [`${value} reps`, 'Total']}
+                        formatter={(value) => [`${value} reps`, 'Total']}
                     />}
                   />
                   <Area
