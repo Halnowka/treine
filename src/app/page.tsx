@@ -10,13 +10,13 @@ import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Wand2, Plus, TestTube2 } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2, Plus } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
-import { parseISO, subDays } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 import { WorkoutEvolution } from '@/components/WorkoutEvolution';
 
@@ -261,55 +261,6 @@ export default function HomePage() {
     });
   }, [toast, currentWorkout.type]);
 
-  const generateMockWorkouts = (count: number): SavedWorkout[] => {
-    const mockWorkouts: SavedWorkout[] = [];
-    const allExercises = [...PUSH_DAY_EXERCISES, ...PULL_DAY_EXERCISES];
-    
-    for (let i = 0; i < count; i++) {
-        const date = subDays(new Date(), i * 2 + Math.floor(Math.random() * 2));
-        const type: WorkoutType = Math.random() > 0.5 ? 'push' : 'pull';
-        const exercisesForDay = type === 'push' ? PUSH_DAY_EXERCISES : PULL_DAY_EXERCISES;
-        
-        const numExercises = Math.floor(Math.random() * exercisesForDay.length) + 1;
-        const exercises: ExerciseLogEntry[] = [];
-
-        for (let j = 0; j < numExercises; j++) {
-            const exerciseDef = exercisesForDay[j];
-            const numSets = Math.floor(Math.random() * 3) + 3; // 3-5 sets
-            const sets: SetData[] = [];
-            for (let k = 0; k < numSets; k++) {
-                sets.push({
-                    id: crypto.randomUUID(),
-                    reps: Math.floor(Math.random() * 8) + 5 + i, // 5-12 reps, increasing over time
-                });
-            }
-            exercises.push({
-                exerciseId: exerciseDef.id,
-                exerciseName: exerciseDef.name,
-                sets,
-            });
-        }
-
-        mockWorkouts.push({
-            id: crypto.randomUUID(),
-            date: date.toISOString(),
-            type,
-            exercises,
-            workoutNotes: `mock workout ${i + 1}`,
-        });
-    }
-    return mockWorkouts;
-  };
-
-  const handleGenerateMockData = () => {
-      const mockData = generateMockWorkouts(30);
-      setSavedWorkouts(prev => 
-          [...prev, ...mockData].sort((a,b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
-      );
-      toast({ title: "mock data generated", description: "30 mock workout sessions have been added." });
-  };
-
-
   if (!isClient) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
@@ -412,12 +363,6 @@ export default function HomePage() {
 
       <footer className="text-center mt-12 py-6 border-t border-border">
         <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
-        <div className="mt-4">
-            <Button variant="outline" size="sm" onClick={handleGenerateMockData} className="lowercase">
-                <TestTube2 className="mr-2 h-4 w-4" />
-                generate mock data (dev)
-            </Button>
-        </div>
       </footer>
     </div>
   );

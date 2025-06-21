@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -98,7 +99,6 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                 <AreaChart
                   accessibilityLayer
                   data={evolutionData}
-                  margin={{ left: -30, right: 30 }}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -109,6 +109,7 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                     tickFormatter={(value) => value}
                   />
                   <YAxis 
+                    orientation="right"
                     tickLine={false} 
                     axisLine={false}
                     tickMargin={8}
