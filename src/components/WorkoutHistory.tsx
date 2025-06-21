@@ -97,21 +97,19 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
                       {format(parseISO(workout.date), "MMMM d, yyyy 'at' h:mm a")}
                     </CardDescription>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
                     { (workout.workoutNotes && workout.workoutNotes.trim() !== "" || workout.exercises.length > 0) && (
-                        isExpanded ? <ChevronUp className="h-6 w-6 text-primary" /> : <ChevronDown className="h-6 w-6 text-primary" />
+                        isExpanded ? <ChevronUp className="h-5 w-5 text-primary" /> : <ChevronDown className="h-5 w-5 text-primary" />
                     )}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
+                        <button
                             onClick={(e) => openDeleteDialog(workout.id, e)}
-                            className="text-destructive hover:text-red-400 h-10 w-10"
+                            className="p-1 text-destructive hover:text-red-400 rounded-full hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             aria-label="delete workout"
                         >
                             <XCircle className="h-5 w-5" />
-                        </Button>
+                        </button>
                       </AlertDialogTrigger>
                       {workoutToDeleteId === workout.id && (
                         <AlertDialogContent>
