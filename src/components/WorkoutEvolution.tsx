@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import type { SavedWorkout } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
@@ -67,20 +67,14 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
 
   return (
     <div className="mt-10">
-      <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center">
-        <TrendingUp className="mr-3 h-8 w-8" /> Workout Evolution
+      <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
+        <TrendingUp className="mr-3 h-8 w-8" /> workout evolution
       </h3>
       <Card className="bg-card text-card-foreground border-border shadow-md">
-        <CardHeader>
-          <CardTitle>Track Your Progress</CardTitle>
-          <CardDescription>
-            Select an exercise to see your total rep evolution over time.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="p-6 space-y-6">
           <Select onValueChange={setSelectedExercise} value={selectedExercise ?? ''}>
             <SelectTrigger className="w-full md:w-[280px]">
-              <SelectValue placeholder="Select an exercise" />
+              <SelectValue placeholder="select an exercise" />
             </SelectTrigger>
             <SelectContent>
               {uniqueExercises.map(ex => (
@@ -138,10 +132,10 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
           ) : (
             <div className="flex flex-col items-center justify-center h-[250px] text-center bg-muted/50 rounded-lg">
                 <BarChart className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground lowercase">
                   {selectedExercise 
-                    ? "You need at least two workouts with this exercise to see a chart."
-                    : "Select an exercise to start the analysis."
+                    ? "you need at least two workouts with this exercise to see a chart."
+                    : "select an exercise to start the analysis."
                   }
                 </p>
             </div>
