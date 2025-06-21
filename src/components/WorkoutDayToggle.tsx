@@ -1,9 +1,8 @@
-
 "use client";
 
 import type { WorkoutType } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Rocket, Anchor } from 'lucide-react';
+import { Sparkle, Atom } from 'lucide-react';
 
 interface WorkoutDayToggleProps {
   selectedDay: WorkoutType | null;
@@ -21,7 +20,7 @@ export function WorkoutDayToggle({ selectedDay, onSelectDay }: WorkoutDayToggleP
         }`}
         aria-pressed={selectedDay === 'push'}
       >
-        <Rocket className="mr-2 h-5 w-5" /> push day
+        <Sparkle className="mr-2 h-5 w-5" /> push day
       </Button>
       <Button
         variant={selectedDay === 'pull' ? 'default' : 'outline'}
@@ -31,7 +30,7 @@ export function WorkoutDayToggle({ selectedDay, onSelectDay }: WorkoutDayToggleP
         }`}
         aria-pressed={selectedDay === 'pull'}
       >
-        <Anchor className="mr-2 h-5 w-5" /> pull day
+        <Atom className="mr-2 h-5 w-5" /> pull day
       </Button>
     </div>
   );
