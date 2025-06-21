@@ -1,11 +1,10 @@
-
 "use client";
 
 import * as React from 'react';
 import type { SavedWorkout } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarClock, XCircle, Orbit, ClipboardList, FileText, Loader2, ChevronDown, ChevronUp, Wand2 } from 'lucide-react';
+import { CalendarClock, XCircle, Orbit, FileText, Loader2, ChevronDown, ChevronUp, Wand2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import {
   AlertDialog,
@@ -69,7 +68,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
   if (savedWorkouts.length === 0 && !isLoading) {
     return (
       <div className="mt-10 text-center">
-        <ClipboardList className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+        <Orbit className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
         <h3 className="text-2xl font-headline text-primary mb-2 lowercase">workout history empty</h3>
         <p className="text-muted-foreground lowercase">no workouts saved yet. complete a session and save it to see it here!</p>
       </div>
@@ -79,7 +78,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
   return (
     <div className="mt-10">
       <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
-         <ClipboardList className="mr-3 h-8 w-8" /> workout history
+         <Orbit className="mr-3 h-8 w-8" /> workout history
       </h3>
       <div className="space-y-4">
         {savedWorkouts.map((workout) => {
@@ -87,7 +86,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
           return (
             <Card key={workout.id} className="bg-card text-card-foreground border-border shadow-md overflow-hidden">
               <CardHeader className="pb-3 cursor-pointer hover:bg-muted/20 transition-colors" onClick={() => toggleWorkoutExpansion(workout.id)}>
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-center">
                   <div className="flex-grow">
                     <CardTitle className="text-2xl font-headline text-primary flex items-center lowercase">
                       <Orbit className="mr-2 h-6 w-6" />

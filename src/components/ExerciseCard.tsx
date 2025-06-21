@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -40,29 +39,27 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
-        <div className="flex justify-between items-center relative">
-          <p className="text-lg font-headline text-primary lowercase">
+        <div className="grid grid-cols-3 items-center">
+          <p className="text-lg font-headline text-primary lowercase justify-self-start truncate">
             {exerciseLog.exerciseName}
           </p>
           
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <button
-              type="button"
-              onClick={toggleAccordion}
-              className="text-3xl font-bold text-primary cursor-pointer focus:outline-none p-2 -m-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring"
-              aria-expanded={activeAccordionItem === "sets"}
-              aria-controls={setsContentId}
-              disabled={exerciseLog.sets.length === 0}
-              aria-label={`expand sets for ${exerciseLog.exerciseName}`}
-            >
-              {exerciseLog.sets.length}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={toggleAccordion}
+            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none p-2 -m-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center"
+            aria-expanded={activeAccordionItem === "sets"}
+            aria-controls={setsContentId}
+            disabled={exerciseLog.sets.length === 0}
+            aria-label={`expand sets for ${exerciseLog.exerciseName}`}
+          >
+            {exerciseLog.sets.length}
+          </button>
           
           <button
             type="button"
             onClick={() => setIsQuickSetLoggerOpen(true)}
-            className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring justify-self-end"
             aria-label={`add set for ${exerciseLog.exerciseName}`}
           >
             add set
