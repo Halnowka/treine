@@ -41,33 +41,20 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
 
   const evolutionData = React.useMemo(() => {
     if (!selectedExercise) return [];
-
-    const dailyTotals: Record<string, number> = {};
-
-    // 1. Group workouts by day and sum total reps for the selected exercise
-    savedWorkouts.forEach(workout => {
-      const exerciseLog = workout.exercises.find(ex => ex.exerciseName === selectedExercise);
-      if (exerciseLog && exerciseLog.sets.length > 0) {
-        const dateKey = format(parseISO(workout.date), 'yyyy-MM-dd'); // Use a consistent key for grouping
+    // The `savedWorkouts` prop is sorted descending by date, so we reverse it for chronological order.
+    return savedWorkouts
+      .filter(workout => 
+        workout.exercises.some(ex => ex.exerciseName === selectedExercise && ex.sets.length > 0)
+      )
+      .map(workout => {
+        const exerciseLog = workout.exercises.find(ex => ex.exerciseName === selectedExercise)!;
         const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
-        if (totalReps > 0) {
-          dailyTotals[dateKey] = (dailyTotals[dateKey] || 0) + totalReps;
-        }
-      }
-    });
-
-    // 2. Convert the grouped data into an array for the chart
-    return Object.entries(dailyTotals)
-      .map(([date, totalReps]) => ({
-        date,
-        totalReps,
-      }))
-      .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
-      .map(item => ({
-        ...item,
-        date: format(parseISO(item.date), "d MMM"), // Format date for display
-      }));
-
+        return {
+          date: format(parseISO(workout.date), "d MMM"),
+          totalReps: totalReps,
+        };
+      })
+      .reverse();
   }, [selectedExercise, savedWorkouts]);
 
 
@@ -103,7 +90,7 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                   data={evolutionData}
                   margin={{
                     left: 12,
-                    right: 12,
+                    right: 30,
                   }}
                 >
                   <CartesianGrid vertical={false} />
