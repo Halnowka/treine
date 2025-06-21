@@ -39,7 +39,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
-      <CardHeader className="px-4 pt-5 pb-3 relative">
+      <CardHeader className="px-4 pt-6 pb-2 relative">
         <div className="flex justify-between items-center w-full">
             <div className="text-lg font-headline text-primary lowercase truncate">
               {exerciseLog.exerciseName}
