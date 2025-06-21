@@ -9,16 +9,17 @@ import { Header } from '@/components/Header';
 import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Wand2, Plus, Loader2, BarChart } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2, Plus, Loader2, BarChart, Orbit, CalendarCheck2, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc, limit, startAfter, QueryDocumentSnapshot } from "firebase/firestore";
-import { parseISO } from 'date-fns';
+import { isSameDay, parseISO, startOfDay } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 import dynamic from 'next/dynamic';
 import { WorkoutCalendar } from '@/components/WorkoutCalendar';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const WORKOUTS_PER_PAGE = 5;
 
@@ -41,9 +42,6 @@ const WorkoutEvolution = dynamic(() =>
   { 
     loading: () => (
       <div className="mt-10">
-        <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
-          <Loader2 className="mr-3 h-8 w-8 animate-spin" /> workout evolution
-        </h3>
         <div className="flex flex-col items-center justify-center h-[342px] text-center bg-card rounded-lg border border-border">
             <BarChart className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground lowercase">
@@ -57,10 +55,12 @@ const WorkoutEvolution = dynamic(() =>
 );
 
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
+const LOCAL_STORAGE_KEY_REST_DAYS = 'kineticTrackerRestDays';
 
 export default function HomePage() {
   const [currentWorkout, setCurrentWorkout] = useState<CurrentWorkout>({ type: null, exercises: [], workoutNotes: '' });
   const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([]);
+  const [restDays, setRestDays] = useState<Date[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
@@ -76,6 +76,11 @@ export default function HomePage() {
       setCurrentWorkout(JSON.parse(storedCurrentWorkout));
     } else {
       setCurrentWorkout({ type: null, exercises: [], workoutNotes: '' });
+    }
+
+    const storedRestDays = localStorage.getItem(LOCAL_STORAGE_KEY_REST_DAYS);
+    if (storedRestDays) {
+      setRestDays(JSON.parse(storedRestDays).map((dateString: string) => new Date(dateString)));
     }
 
     const fetchInitialWorkouts = async () => {
@@ -112,6 +117,12 @@ export default function HomePage() {
 
   }, [toast]);
   
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_REST_DAYS, JSON.stringify(restDays));
+    }
+  }, [restDays, isClient]);
+
   const handleLoadMore = useCallback(async () => {
     if (!lastVisibleDoc || !hasMore) return;
 
@@ -340,6 +351,33 @@ export default function HomePage() {
     });
   }, [toast, currentWorkout.type]);
 
+  const handleToggleRestDay = useCallback((day: Date) => {
+    const dayStart = startOfDay(day);
+
+    const isWorkoutDay = savedWorkouts.some(workout => 
+      isSameDay(parseISO(workout.date), dayStart)
+    );
+
+    if (isWorkoutDay) {
+      toast({
+        title: "workout day",
+        description: "this day is already logged as a workout and cannot be a rest day.",
+        variant: "default"
+      });
+      return;
+    }
+
+    setRestDays(prevRestDays => {
+      const isRestDay = prevRestDays.some(restDay => isSameDay(restDay, dayStart));
+      if (isRestDay) {
+        return prevRestDays.filter(restDay => !isSameDay(restDay, dayStart));
+      } else {
+        return [...prevRestDays, dayStart];
+      }
+    });
+  }, [savedWorkouts, toast]);
+
+
   if (!isClient) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
@@ -425,19 +463,54 @@ export default function HomePage() {
         </div>
       )}
 
-      <WorkoutHistory 
-        savedWorkouts={savedWorkouts} 
-        onDeleteWorkout={handleDeleteWorkout} 
-        onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
-        isLoading={isLoadingHistory}
-        onLoadMore={handleLoadMore}
-        hasMore={hasMore}
-        isLoadingMore={isLoadingMore}
-      />
+      <div className="mt-10 space-y-4">
+        <Accordion type="multiple" className="w-full space-y-4">
+          <AccordionItem value="history">
+            <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
+              <div className="flex items-center">
+                <Orbit className="mr-3 h-8 w-8" /> workout history
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <WorkoutHistory 
+                savedWorkouts={savedWorkouts} 
+                onDeleteWorkout={handleDeleteWorkout} 
+                onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
+                isLoading={isLoadingHistory}
+                onLoadMore={handleLoadMore}
+                hasMore={hasMore}
+                isLoadingMore={isLoadingMore}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        
+          <AccordionItem value="calendar">
+            <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
+                <div className="flex items-center">
+                    <CalendarCheck2 className="mr-3 h-8 w-8" /> workout calendar
+                </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <WorkoutCalendar 
+                savedWorkouts={savedWorkouts} 
+                restDays={restDays}
+                onDayClick={(day) => handleToggleRestDay(day)}
+              />
+            </AccordionContent>
+          </AccordionItem>
 
-      <WorkoutCalendar savedWorkouts={savedWorkouts} />
-
-      <WorkoutEvolution savedWorkouts={savedWorkouts} />
+          <AccordionItem value="evolution">
+            <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
+                 <div className="flex items-center">
+                    <TrendingUp className="mr-3 h-8 w-8" /> workout evolution
+                 </div>
+            </AccordionTrigger>
+            <AccordionContent>
+                <WorkoutEvolution savedWorkouts={savedWorkouts} />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
       
       <AddExerciseDialog 
         isOpen={isAddExerciseDialogOpen}
@@ -451,5 +524,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    

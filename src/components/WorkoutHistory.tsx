@@ -88,10 +88,7 @@ export function WorkoutHistory({
   }
 
   return (
-    <div className="mt-10">
-      <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
-         <Orbit className="mr-3 h-8 w-8" /> workout history
-      </h3>
+    <div>
       <div className="space-y-4">
         {savedWorkouts.map((workout) => {
           const isExpanded = activeWorkoutId === workout.id;
@@ -233,5 +230,3 @@ export function WorkoutHistory({
     </div>
   );
 }
-
-    
