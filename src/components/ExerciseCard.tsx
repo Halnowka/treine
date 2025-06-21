@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState } from 'react';
 import type { ExerciseLogEntry, SetData } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
-import { Trash2 } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 import { QuickSetLoggerDialog } from './QuickSetLoggerDialog';
 
 interface ExerciseCardProps {
@@ -93,7 +94,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
                           className="text-destructive hover:text-red-400 h-8 w-8 p-0 bg-transparent border-none flex items-center justify-center focus:outline-none focus-visible:ring-1 focus-visible:ring-destructive rounded-md"
                           aria-label={`delete set ${index + 1} for ${exerciseLog.exerciseName}`}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <XCircle className="h-4 w-4" />
                         </button>
                       </div>
                     </li>

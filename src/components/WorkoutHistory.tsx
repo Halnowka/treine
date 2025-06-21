@@ -1,10 +1,11 @@
+
 "use client";
 
 import * as React from 'react';
 import type { SavedWorkout } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarDays, Trash2, Dumbbell, ListChecks, StickyNote, Loader2, ChevronDown, ChevronUp, Edit3 } from 'lucide-react';
+import { CalendarClock, XCircle, Orbit, ClipboardList, FileText, Loader2, ChevronDown, ChevronUp, Wand2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import {
   AlertDialog,
@@ -68,7 +69,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
   if (savedWorkouts.length === 0 && !isLoading) {
     return (
       <div className="mt-10 text-center">
-        <ListChecks className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+        <ClipboardList className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
         <h3 className="text-2xl font-headline text-primary mb-2 lowercase">workout history empty</h3>
         <p className="text-muted-foreground lowercase">no workouts saved yet. complete a session and save it to see it here!</p>
       </div>
@@ -78,7 +79,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
   return (
     <div className="mt-10">
       <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
-         <ListChecks className="mr-3 h-8 w-8" /> workout history
+         <ClipboardList className="mr-3 h-8 w-8" /> workout history
       </h3>
       <div className="space-y-4">
         {savedWorkouts.map((workout) => {
@@ -89,11 +90,11 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
                 <div className="flex justify-between items-start">
                   <div className="flex-grow">
                     <CardTitle className="text-2xl font-headline text-primary flex items-center lowercase">
-                      <Dumbbell className="mr-2 h-6 w-6" />
+                      <Orbit className="mr-2 h-6 w-6" />
                       {workout.type} day workout
                     </CardTitle>
                     <CardDescription className="text-base text-muted-foreground flex items-center mt-1 lowercase">
-                      <CalendarDays className="mr-2 h-4 w-4" />
+                      <CalendarClock className="mr-2 h-4 w-4" />
                       {format(parseISO(workout.date), "MMMM d, yyyy 'at' h:mm a")}
                     </CardDescription>
                   </div>
@@ -110,7 +111,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
                             className="text-destructive hover:text-red-400 h-10 w-10"
                             aria-label="delete workout"
                         >
-                            <Trash2 className="h-5 w-5" />
+                            <XCircle className="h-5 w-5" />
                         </Button>
                       </AlertDialogTrigger>
                       {workoutToDeleteId === workout.id && (
@@ -136,12 +137,12 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
                   <div className="p-3 bg-muted/30 rounded-md border border-border/30">
                       <div className="flex justify-between items-center mb-1">
                           <h4 className="font-semibold text-accent text-md flex items-center lowercase">
-                              <StickyNote className="mr-2 h-5 w-5" />
+                              <FileText className="mr-2 h-5 w-5" />
                               workout notes
                           </h4>
                           {editingWorkout?.id !== workout.id && (
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => setEditingWorkout({ id: workout.id, notes: workout.workoutNotes || '' })}>
-                                  <Edit3 className="h-4 w-4" />
+                                  <Wand2 className="h-4 w-4" />
                               </Button>
                           )}
                       </div>
