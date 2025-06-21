@@ -19,9 +19,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  devIndicators: {
-    buildActivity: true, // Ensures the build activity indicator is enabled
-  },
 };
 
 export default nextConfig;
