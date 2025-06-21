@@ -3,7 +3,7 @@
 
 import type { WorkoutType } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Zap, Shield } from 'lucide-react';
+import { Rocket, Anchor } from 'lucide-react';
 
 interface WorkoutDayToggleProps {
   selectedDay: WorkoutType | null;
@@ -21,7 +21,7 @@ export function WorkoutDayToggle({ selectedDay, onSelectDay }: WorkoutDayToggleP
         }`}
         aria-pressed={selectedDay === 'push'}
       >
-        <Zap className="mr-2 h-5 w-5" /> push day
+        <Rocket className="mr-2 h-5 w-5" /> push day
       </Button>
       <Button
         variant={selectedDay === 'pull' ? 'default' : 'outline'}
@@ -31,7 +31,7 @@ export function WorkoutDayToggle({ selectedDay, onSelectDay }: WorkoutDayToggleP
         }`}
         aria-pressed={selectedDay === 'pull'}
       >
-        <Shield className="mr-2 h-5 w-5" /> pull day
+        <Anchor className="mr-2 h-5 w-5" /> pull day
       </Button>
     </div>
   );
