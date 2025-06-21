@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -40,9 +39,19 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
       <CardHeader className="p-6 pb-3">
-        <div className="relative flex h-12 items-baseline justify-between">
-          <div className="text-lg font-headline text-primary lowercase truncate">
-            {exerciseLog.exerciseName}
+        <div className="relative flex h-12 justify-between">
+          <div className="flex w-full items-center justify-between">
+            <div className="text-lg font-headline text-primary lowercase truncate">
+              {exerciseLog.exerciseName}
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsQuickSetLoggerOpen(true)}
+              className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={`add set for ${exerciseLog.exerciseName}`}
+            >
+              add set
+            </button>
           </div>
 
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -56,17 +65,6 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
               aria-label={`expand sets for ${exerciseLog.exerciseName}`}
             >
               {exerciseLog.sets.length}
-            </button>
-          </div>
-
-          <div>
-            <button
-              type="button"
-              onClick={() => setIsQuickSetLoggerOpen(true)}
-              className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label={`add set for ${exerciseLog.exerciseName}`}
-            >
-              add set
             </button>
           </div>
         </div>
