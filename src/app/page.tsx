@@ -10,7 +10,7 @@ import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Wand2 } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2, Plus } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -255,6 +255,15 @@ export default function HomePage() {
             onDeleteSet={handleDeleteSet}
           />
         ))}
+         {currentWorkout.type && (
+            <button
+              onClick={() => toast({ title: "feature not implemented", description: "adding custom exercises will be available soon."})}
+              className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/40 bg-card text-muted-foreground hover:border-primary hover:text-primary transition-colors duration-200 min-h-[120px]"
+              aria-label="add custom exercise"
+            >
+              <Plus className="h-10 w-10" />
+            </button>
+        )}
       </div>
       
       {currentWorkout.type && currentWorkout.exercises.length === 0 && (

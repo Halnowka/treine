@@ -4,7 +4,7 @@ import type { ExerciseDefinition } from '@/types';
 export const PUSH_DAY_EXERCISES: ExerciseDefinition[] = [
   { id: 'flexao', name: 'push-up' },
   { id: 'dips', name: 'dips' },
-  { id: 'abs', name: 'crunches' },
+  { id: 'abs', name: 'leg raise' },
 ];
 
 export const PULL_DAY_EXERCISES: ExerciseDefinition[] = [
