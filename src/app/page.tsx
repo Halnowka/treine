@@ -10,7 +10,7 @@ import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Edit3 } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -77,13 +77,15 @@ export default function HomePage() {
       currentWorkout.exercises.some(ex => ex.sets.length > 0) ||
       (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '');
 
-    if (isSameDay && hasExistingProgress) {
-      toast({ title: "workout resumed", description: `continuing with your ${newDay} workout.` });
+    if (isSameDay) {
+      if (hasExistingProgress) {
+        toast({ title: "workout resumed", description: `continuing with your ${newDay} workout.` });
+      }
       return;
     }
 
-    if (currentWorkout.type !== null && !isSameDay && hasExistingProgress) {
-      if (!confirm("you have unsaved progress (sets or notes) from your previous workout. changing workout type will clear it. continue?")) {
+    if (currentWorkout.type !== null && hasExistingProgress) {
+      if (!confirm("you have unsaved progress (sets or notes). changing workout type will clear it. continue?")) {
         return; 
       }
     }
@@ -269,7 +271,7 @@ export default function HomePage() {
         <div className="my-6 space-y-6">
           <div className="max-w-xl mx-auto">
             <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
-              <Edit3 className="mr-2 h-5 w-5" />
+              <Wand2 className="mr-2 h-5 w-5" />
               workout notes ({currentWorkout.type} day)
             </Label>
             <Textarea
@@ -306,5 +308,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    

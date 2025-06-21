@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState } from 'react';
 import type { ExerciseLogEntry, SetData } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
-import { Trash2 } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 import { QuickSetLoggerDialog } from './QuickSetLoggerDialog';
 
 interface ExerciseCardProps {
@@ -38,17 +39,26 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
 
   return (
     <Card className="bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center relative">
-          <p className="text-lg font-headline text-primary lowercase">
-            {exerciseLog.exerciseName}
-          </p>
-          
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <CardHeader className="px-4 pt-7 pb-2 relative">
+        <div className="flex justify-between items-center w-full">
+            <div className="text-lg font-headline text-primary lowercase truncate">
+              {exerciseLog.exerciseName}
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsQuickSetLoggerOpen(true)}
+              className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={`add set for ${exerciseLog.exerciseName}`}
+            >
+              add set
+            </button>
+        </div>
+
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <button
               type="button"
               onClick={toggleAccordion}
-              className="text-3xl font-bold text-primary cursor-pointer focus:outline-none p-2 -m-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring"
+              className="text-3xl font-bold text-primary cursor-pointer focus:outline-none rounded-md focus-visible:ring-2 focus-visible:ring-ring flex h-12 w-12 items-center justify-center"
               aria-expanded={activeAccordionItem === "sets"}
               aria-controls={setsContentId}
               disabled={exerciseLog.sets.length === 0}
@@ -56,16 +66,6 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
             >
               {exerciseLog.sets.length}
             </button>
-          </div>
-          
-          <button
-            type="button"
-            onClick={() => setIsQuickSetLoggerOpen(true)}
-            className="text-primary hover:text-accent-foreground cursor-pointer text-lg lowercase p-0 bg-transparent border-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={`add set for ${exerciseLog.exerciseName}`}
-          >
-            add set
-          </button>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -93,7 +93,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
                           className="text-destructive hover:text-red-400 h-8 w-8 p-0 bg-transparent border-none flex items-center justify-center focus:outline-none focus-visible:ring-1 focus-visible:ring-destructive rounded-md"
                           aria-label={`delete set ${index + 1} for ${exerciseLog.exerciseName}`}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <XCircle className="h-4 w-4" />
                         </button>
                       </div>
                     </li>
