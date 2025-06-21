@@ -73,10 +73,7 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
   }
 
   return (
-    <div className="mt-10">
-      <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
-        <TrendingUp className="mr-3 h-8 w-8" /> workout evolution
-      </h3>
+    <div>
       <Card className="bg-card text-card-foreground border-border shadow-md">
         <CardContent className="p-6 space-y-6">
           <Select onValueChange={setSelectedExercise} value={selectedExercise ?? ''}>

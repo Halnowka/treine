@@ -100,4 +100,17 @@
     /* Ensure the Inter font from layout.tsx is applied */
     font-family: var(--font-inter), sans-serif;
   }
+
+  .day-push:not([aria-selected]) {
+    background-color: hsl(220 70% 50% / 0.2) !important;
+    color: hsl(220 90% 80%);
+  }
+  .day-pull:not([aria-selected]) {
+    background-color: hsl(40 80% 55% / 0.2) !important;
+    color: hsl(40 90% 80%);
+  }
+  .day-rest:not([aria-selected]) {
+    background-color: hsl(var(--muted) / 0.5) !important;
+    color: hsl(var(--muted-foreground));
+  }
 }
