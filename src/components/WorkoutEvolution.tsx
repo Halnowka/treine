@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -6,7 +5,7 @@ import type { SavedWorkout } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { parseISO, format } from 'date-fns';
 import { TrendingUp, BarChart } from 'lucide-react';
 
@@ -107,14 +106,6 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                     axisLine={false}
                     tickMargin={8}
                     tickFormatter={(value) => value}
-                  />
-                  <YAxis 
-                    orientation="right"
-                    tickLine={false} 
-                    axisLine={false}
-                    tickMargin={8}
-                    domain={['dataMin - 5', 'auto']}
-                    allowDecimals={false}
                   />
                   <ChartTooltip
                     cursor={false}
