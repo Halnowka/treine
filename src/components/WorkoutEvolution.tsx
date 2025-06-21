@@ -89,7 +89,7 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                   accessibilityLayer
                   data={evolutionData}
                   margin={{
-                    left: 12,
+                    left: 0,
                     right: 30,
                   }}
                 >
