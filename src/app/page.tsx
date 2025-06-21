@@ -85,25 +85,36 @@ export default function HomePage() {
 
     const exercisesForDay: ExerciseDefinition[] = newDay === 'push' ? PUSH_DAY_EXERCISES : PULL_DAY_EXERCISES;
     
-    const existingSets = new Map<string, SetData[]>();
-    if (isSameDay) {
-        currentWorkout.exercises.forEach(ex => {
-            existingSets.set(ex.exerciseId, ex.sets);
-        });
-    }
-
-    setCurrentWorkout(prev => ({
-      type: newDay,
-      exercises: exercisesForDay.map(ex => ({
-        exerciseId: ex.id,
-        exerciseName: ex.name,
-        sets: existingSets.get(ex.exerciseId) || [], 
-      })),
-      workoutNotes: isSameDay ? prev.workoutNotes || '' : '',
-    }));
-    
+    // If it's a new day, reset everything
     if (!isSameDay) {
+        setCurrentWorkout({
+          type: newDay,
+          exercises: exercisesForDay.map(ex => ({
+            exerciseId: ex.id,
+            exerciseName: ex.name,
+            sets: [], 
+          })),
+          workoutNotes: '',
+        });
         toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
+    } else { // If it's the SAME day, refresh the list but keep progress
+        const existingSets = new Map<string, SetData[]>();
+        currentWorkout.exercises.forEach(ex => {
+            if (ex.sets.length > 0) {
+                existingSets.set(ex.exerciseId, ex.sets);
+            }
+        });
+
+        setCurrentWorkout(prev => ({
+            ...prev,
+            type: newDay,
+            exercises: exercisesForDay.map(ex => ({
+                exerciseId: ex.id,
+                exerciseName: ex.name,
+                sets: existingSets.get(ex.id) || [],
+            })),
+            // Notes are preserved because we spread `prev`
+        }));
     }
   }, [currentWorkout, toast]);
 
