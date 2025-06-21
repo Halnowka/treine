@@ -48,7 +48,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
           <button
             type="button"
             onClick={toggleAccordion}
-            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none p-2 -m-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center"
+            className="text-3xl font-bold text-primary cursor-pointer focus:outline-none p-2 -m-2 rounded-md focus-visible:ring-2 focus-visible:ring-ring justify-self-center flex items-center justify-center"
             aria-expanded={activeAccordionItem === "sets"}
             aria-controls={setsContentId}
             disabled={exerciseLog.sets.length === 0}
