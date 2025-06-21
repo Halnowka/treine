@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { parseISO, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { TrendingUp, BarChart } from 'lucide-react';
 
 interface WorkoutEvolutionProps {
@@ -58,7 +57,7 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
       .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
       .map(item => ({
         ...item,
-        date: format(parseISO(item.date), "d MMM", { locale: ptBR }),
+        date: format(parseISO(item.date), "d MMM"),
       }));
   }, [selectedExercise, savedWorkouts]);
 
@@ -68,20 +67,20 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
 
   return (
     <div className="mt-10">
-      <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
-        <TrendingUp className="mr-3 h-8 w-8" /> análise de evolução
+      <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center">
+        <TrendingUp className="mr-3 h-8 w-8" /> Workout Evolution
       </h3>
       <Card className="bg-card text-card-foreground border-border shadow-md">
         <CardHeader>
-          <CardTitle className="lowercase">veja seu progresso</CardTitle>
-          <CardDescription className="lowercase">
-            selecione um exercício para visualizar sua evolução no total de repetições ao longo do tempo.
+          <CardTitle>Track Your Progress</CardTitle>
+          <CardDescription>
+            Select an exercise to see your total rep evolution over time.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <Select onValueChange={setSelectedExercise} value={selectedExercise ?? ''}>
             <SelectTrigger className="w-full md:w-[280px]">
-              <SelectValue placeholder="selecione um exercício" />
+              <SelectValue placeholder="Select an exercise" />
             </SelectTrigger>
             <SelectContent>
               {uniqueExercises.map(ex => (
@@ -139,10 +138,10 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
           ) : (
             <div className="flex flex-col items-center justify-center h-[250px] text-center bg-muted/50 rounded-lg">
                 <BarChart className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground lowercase">
+                <p className="text-muted-foreground">
                   {selectedExercise 
-                    ? "você precisa de pelo menos dois treinos com este exercício para ver um gráfico."
-                    : "selecione um exercício para começar a análise."
+                    ? "You need at least two workouts with this exercise to see a chart."
+                    : "Select an exercise to start the analysis."
                   }
                 </p>
             </div>
