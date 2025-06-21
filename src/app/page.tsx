@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import type { WorkoutType, ExerciseLogEntry, SavedWorkout, CurrentWorkout, ExerciseDefinition } from '@/types';
+import type { WorkoutType, ExerciseLogEntry, SavedWorkout, CurrentWorkout, ExerciseDefinition, SetData } from '@/types';
 import { PUSH_DAY_EXERCISES, PULL_DAY_EXERCISES } from '@/lib/exercises';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
@@ -77,31 +77,36 @@ export default function HomePage() {
       currentWorkout.exercises.some(ex => ex.sets.length > 0) ||
       (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '');
 
-    if (isSameDay) {
-      if (hasExistingProgress) {
-        toast({ title: "workout resumed", description: `continuing with your ${newDay} workout.` });
-      }
-      return;
-    }
-
-    if (currentWorkout.type !== null && hasExistingProgress) {
+    if (!isSameDay && hasExistingProgress) {
       if (!confirm("you have unsaved progress (sets or notes). changing workout type will clear it. continue?")) {
         return; 
       }
     }
 
     const exercisesForDay: ExerciseDefinition[] = newDay === 'push' ? PUSH_DAY_EXERCISES : PULL_DAY_EXERCISES;
-    setCurrentWorkout({
+    
+    const existingSets = new Map<string, SetData[]>();
+    if (isSameDay) {
+        currentWorkout.exercises.forEach(ex => {
+            existingSets.set(ex.exerciseId, ex.sets);
+        });
+    }
+
+    setCurrentWorkout(prev => ({
       type: newDay,
       exercises: exercisesForDay.map(ex => ({
         exerciseId: ex.id,
         exerciseName: ex.name,
-        sets: [],
+        sets: existingSets.get(ex.exerciseId) || [], 
       })),
-      workoutNotes: '', 
-    });
-    toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
+      workoutNotes: isSameDay ? prev.workoutNotes || '' : '',
+    }));
+    
+    if (!isSameDay) {
+        toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
+    }
   }, [currentWorkout, toast]);
+
 
   const handleUpdateExerciseLog = useCallback((updatedLog: ExerciseLogEntry) => {
     setCurrentWorkout(prev => ({
