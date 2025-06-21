@@ -1,9 +1,8 @@
-
 "use client";
 
 import * as React from 'react';
 import type { SavedWorkout } from '@/types';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
@@ -41,21 +40,32 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
 
   const evolutionData = React.useMemo(() => {
     if (!selectedExercise) return [];
-    // The `savedWorkouts` prop is sorted descending by date, so we reverse it for chronological order.
-    return savedWorkouts
-      .filter(workout => 
-        workout.exercises.some(ex => ex.exerciseName === selectedExercise && ex.sets.length > 0)
-      )
-      .map(workout => {
-        const exerciseLog = workout.exercises.find(ex => ex.exerciseName === selectedExercise)!;
-        const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
-        return {
-          date: format(parseISO(workout.date), "d MMM"),
-          totalReps: totalReps,
-        };
-      })
-      .reverse();
-  }, [selectedExercise, savedWorkouts]);
+
+    const repsByDay = savedWorkouts.reduce((acc: Record<string, number>, workout) => {
+        const exerciseLog = workout.exercises.find(
+            (ex) => ex.exerciseName === selectedExercise && ex.sets.length > 0
+        );
+
+        if (exerciseLog) {
+            const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
+            const dayKey = format(parseISO(workout.date), "yyyy-MM-dd");
+            
+            acc[dayKey] = (acc[dayKey] || 0) + totalReps;
+        }
+
+        return acc;
+    }, {});
+
+    const chartData = Object.keys(repsByDay)
+        .map((dayKey) => ({
+            date: format(parseISO(dayKey), "d MMM"),
+            totalReps: repsByDay[dayKey],
+            originalDate: parseISO(dayKey),
+        }))
+        .sort((a, b) => a.originalDate.getTime() - b.originalDate.getTime());
+
+    return chartData.map(({ date, totalReps }) => ({ date, totalReps }));
+}, [selectedExercise, savedWorkouts]);
 
 
   if (savedWorkouts.length === 0 || uniqueExercises.length === 0) {
@@ -88,10 +98,6 @@ export function WorkoutEvolution({ savedWorkouts }: WorkoutEvolutionProps) {
                 <AreaChart
                   accessibilityLayer
                   data={evolutionData}
-                  margin={{
-                    left: 0,
-                    right: 30,
-                  }}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
