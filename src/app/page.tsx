@@ -8,9 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
 import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
-import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Wand2, Plus } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2, Plus, Loader2, BarChart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -18,7 +17,41 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
 import { parseISO } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
-import { WorkoutEvolution } from '@/components/WorkoutEvolution';
+import dynamic from 'next/dynamic';
+
+const WorkoutHistory = dynamic(() => 
+  import('@/components/WorkoutHistory').then(mod => mod.WorkoutHistory), 
+  { 
+    loading: () => (
+      <div className="mt-10 text-center">
+        <Loader2 className="mx-auto h-12 w-12 text-primary animate-spin mb-4" />
+        <h3 className="text-2xl font-headline text-primary mb-2 lowercase">loading history...</h3>
+        <p className="text-muted-foreground lowercase">fetching your saved workouts.</p>
+      </div>
+    ),
+    ssr: false 
+  }
+);
+
+const WorkoutEvolution = dynamic(() => 
+  import('@/components/WorkoutEvolution').then(mod => mod.WorkoutEvolution),
+  { 
+    loading: () => (
+      <div className="mt-10">
+        <h3 className="text-3xl font-headline text-primary mb-6 text-center flex items-center justify-center lowercase">
+          <Loader2 className="mr-3 h-8 w-8 animate-spin" /> workout evolution
+        </h3>
+        <div className="flex flex-col items-center justify-center h-[342px] text-center bg-card rounded-lg border border-border">
+            <BarChart className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground lowercase">
+              loading chart...
+            </p>
+        </div>
+      </div>
+    ),
+    ssr: false 
+  }
+);
 
 
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
