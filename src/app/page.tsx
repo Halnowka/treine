@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
 import { parseISO } from 'date-fns';
+import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 
 
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
@@ -26,6 +27,7 @@ export default function HomePage() {
   const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -97,23 +99,22 @@ export default function HomePage() {
           workoutNotes: '',
         });
         toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
-    } else { // If it's the SAME day, refresh the list but keep progress
-        const existingSets = new Map<string, SetData[]>();
+    } else { // If it's the SAME day, refresh the list but keep progress and custom exercises
+        const existingProgress = new Map<string, ExerciseLogEntry>();
         currentWorkout.exercises.forEach(ex => {
-            if (ex.sets.length > 0) {
-                existingSets.set(ex.exerciseId, ex.sets);
-            }
+            existingProgress.set(ex.exerciseId, ex);
         });
 
+        const newBaseExercises = exercisesForDay.map(exDef => 
+            existingProgress.get(exDef.id) || { exerciseId: exDef.id, exerciseName: exDef.name, sets: [] }
+        );
+
+        const customExercises = currentWorkout.exercises.filter(ex => ex.exerciseId.startsWith('custom-'));
+        
         setCurrentWorkout(prev => ({
             ...prev,
             type: newDay,
-            exercises: exercisesForDay.map(ex => ({
-                exerciseId: ex.id,
-                exerciseName: ex.name,
-                sets: existingSets.get(ex.id) || [],
-            })),
-            // Notes are preserved because we spread `prev`
+            exercises: [...newBaseExercises, ...customExercises],
         }));
     }
   }, [currentWorkout, toast]);
@@ -237,6 +238,24 @@ export default function HomePage() {
     }
   }, [toast]);
 
+  const handleAddCustomExercise = useCallback((exerciseName: string) => {
+    const newExercise: ExerciseLogEntry = {
+      exerciseId: `custom-${exerciseName.toLowerCase().replace(/\s+/g, '-')}-${crypto.randomUUID()}`,
+      exerciseName: exerciseName,
+      sets: [],
+    };
+
+    setCurrentWorkout(prev => ({
+      ...prev,
+      exercises: [...prev.exercises, newExercise],
+    }));
+
+    toast({
+      title: "exercise added",
+      description: `"${exerciseName}" has been added to your workout.`,
+    });
+  }, [toast]);
+
   if (!isClient || isLoadingHistory) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
@@ -274,7 +293,7 @@ export default function HomePage() {
          {currentWorkout.type && (
             <div className="flex items-center justify-center">
                 <button
-                onClick={() => toast({ title: "feature not implemented", description: "adding custom exercises will be available soon."})}
+                onClick={() => setIsAddExerciseDialogOpen(true)}
                 className="text-muted-foreground/70 hover:text-primary transition-colors"
                 aria-label="add custom exercise"
                 >
@@ -329,6 +348,12 @@ export default function HomePage() {
         isLoading={isLoadingHistory} 
       />
       
+      <AddExerciseDialog 
+        isOpen={isAddExerciseDialogOpen}
+        onOpenChange={setIsAddExerciseDialogOpen}
+        onAddExercise={handleAddCustomExercise}
+      />
+
       <footer className="text-center mt-12 py-6 border-t border-border">
         <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
       </footer>
