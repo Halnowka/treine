@@ -18,6 +18,7 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
 import { parseISO } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
+import { WorkoutEvolution } from '@/components/WorkoutEvolution';
 
 
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
@@ -239,6 +240,10 @@ export default function HomePage() {
   }, [toast]);
 
   const handleAddCustomExercise = useCallback((exerciseName: string) => {
+    if (!currentWorkout.type) {
+        toast({ title: "select a workout day first", variant: "destructive"});
+        return;
+    }
     const newExercise: ExerciseLogEntry = {
       exerciseId: `custom-${exerciseName.toLowerCase().replace(/\s+/g, '-')}-${crypto.randomUUID()}`,
       exerciseName: exerciseName,
@@ -254,14 +259,14 @@ export default function HomePage() {
       title: "exercise added",
       description: `"${exerciseName}" has been added to your workout.`,
     });
-  }, [toast]);
+  }, [toast, currentWorkout.type]);
 
-  if (!isClient || isLoadingHistory) {
+  if (!isClient) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
         <Header />
         <p className="text-xl text-primary lowercase">loading treine...</p>
-        {isLoadingHistory && <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>}
+        <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>
       </div>
     );
   }
@@ -347,6 +352,8 @@ export default function HomePage() {
         onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
         isLoading={isLoadingHistory} 
       />
+
+      <WorkoutEvolution savedWorkouts={savedWorkouts} />
       
       <AddExerciseDialog 
         isOpen={isAddExerciseDialogOpen}
