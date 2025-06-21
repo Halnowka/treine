@@ -85,7 +85,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
           const isExpanded = activeWorkoutId === workout.id;
           return (
             <Card key={workout.id} className="bg-card text-card-foreground border-border shadow-md overflow-hidden">
-              <CardHeader className="pb-3 cursor-pointer hover:bg-muted/20 transition-colors" onClick={() => toggleWorkoutExpansion(workout.id)}>
+              <CardHeader className="p-4 cursor-pointer hover:bg-muted/20 transition-colors" onClick={() => toggleWorkoutExpansion(workout.id)}>
                 <div className="flex justify-between items-center">
                   <div className="flex-grow">
                     <CardTitle className="text-2xl font-headline text-primary flex items-center lowercase">
@@ -97,7 +97,7 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
                       {format(parseISO(workout.date), "MMMM d, yyyy 'at' h:mm a")}
                     </CardDescription>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     { (workout.workoutNotes && workout.workoutNotes.trim() !== "" || workout.exercises.length > 0) && (
                         isExpanded ? <ChevronUp className="h-5 w-5 text-primary" /> : <ChevronDown className="h-5 w-5 text-primary" />
                     )}
