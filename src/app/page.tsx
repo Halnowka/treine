@@ -256,13 +256,15 @@ export default function HomePage() {
           />
         ))}
          {currentWorkout.type && (
-            <button
-              onClick={() => toast({ title: "feature not implemented", description: "adding custom exercises will be available soon."})}
-              className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/40 bg-card text-muted-foreground hover:border-primary hover:text-primary transition-colors duration-200 min-h-[120px]"
-              aria-label="add custom exercise"
-            >
-              <Plus className="h-10 w-10" />
-            </button>
+            <div className="flex items-center justify-center">
+                <button
+                onClick={() => toast({ title: "feature not implemented", description: "adding custom exercises will be available soon."})}
+                className="text-muted-foreground/70 hover:text-primary transition-colors"
+                aria-label="add custom exercise"
+                >
+                <Plus className="h-10 w-10" />
+                </button>
+            </div>
         )}
       </div>
       
