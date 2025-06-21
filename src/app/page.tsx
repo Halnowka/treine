@@ -18,6 +18,7 @@ import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp,
 import { parseISO } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 import dynamic from 'next/dynamic';
+import { WorkoutCalendar } from '@/components/WorkoutCalendar';
 
 const WORKOUTS_PER_PAGE = 5;
 
@@ -433,6 +434,8 @@ export default function HomePage() {
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
       />
+
+      <WorkoutCalendar savedWorkouts={savedWorkouts} />
 
       <WorkoutEvolution savedWorkouts={savedWorkouts} />
       

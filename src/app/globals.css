@@ -100,4 +100,13 @@
     /* Ensure the Inter font from layout.tsx is applied */
     font-family: var(--font-inter), sans-serif;
   }
+
+  .day-push:not([aria-selected]) {
+    background-color: hsl(var(--primary) / 0.3) !important;
+    color: hsl(var(--primary));
+  }
+  .day-pull:not([aria-selected]) {
+    background-color: hsl(var(--accent) / 0.3) !important;
+    color: hsl(var(--accent));
+  }
 }
