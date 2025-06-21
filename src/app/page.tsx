@@ -14,10 +14,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc, limit, startAfter, QueryDocumentSnapshot } from "firebase/firestore";
 import { parseISO } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 import dynamic from 'next/dynamic';
+
+const WORKOUTS_PER_PAGE = 5;
 
 const WorkoutHistory = dynamic(() => 
   import('@/components/WorkoutHistory').then(mod => mod.WorkoutHistory), 
@@ -53,7 +55,6 @@ const WorkoutEvolution = dynamic(() =>
   }
 );
 
-
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
 
 export default function HomePage() {
@@ -62,6 +63,9 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
+  const [lastVisibleDoc, setLastVisibleDoc] = useState<QueryDocumentSnapshot | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -73,11 +77,12 @@ export default function HomePage() {
       setCurrentWorkout({ type: null, exercises: [], workoutNotes: '' });
     }
 
-    const fetchWorkouts = async () => {
+    const fetchInitialWorkouts = async () => {
       setIsLoadingHistory(true);
+      setHasMore(true);
       try {
         const workoutsCol = collection(db, 'workouts');
-        const q = query(workoutsCol, orderBy('date', 'desc'));
+        const q = query(workoutsCol, orderBy('date', 'desc'), limit(WORKOUTS_PER_PAGE));
         const workoutSnapshot = await getDocs(q);
         const workoutList = workoutSnapshot.docs.map(docSnap => {
           const data = docSnap.data();
@@ -90,6 +95,11 @@ export default function HomePage() {
           } as SavedWorkout;
         });
         setSavedWorkouts(workoutList);
+        const lastVisible = workoutSnapshot.docs[workoutSnapshot.docs.length - 1];
+        setLastVisibleDoc(lastVisible);
+        if (workoutSnapshot.docs.length < WORKOUTS_PER_PAGE) {
+            setHasMore(false);
+        }
       } catch (error) {
         console.error("error fetching workouts: ", error);
         toast({ title: "error fetching workouts", description: "could not load workout history from the database.", variant: "destructive" });
@@ -97,9 +107,45 @@ export default function HomePage() {
       setIsLoadingHistory(false);
     };
 
-    fetchWorkouts();
+    fetchInitialWorkouts();
 
   }, [toast]);
+  
+  const handleLoadMore = useCallback(async () => {
+    if (!lastVisibleDoc || !hasMore) return;
+
+    setIsLoadingMore(true);
+    try {
+        const workoutsCol = collection(db, 'workouts');
+        const q = query(workoutsCol, orderBy('date', 'desc'), startAfter(lastVisibleDoc), limit(WORKOUTS_PER_PAGE));
+        const workoutSnapshot = await getDocs(q);
+
+        const newWorkoutList = workoutSnapshot.docs.map(docSnap => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            type: data.type as WorkoutType,
+            exercises: data.exercises as ExerciseLogEntry[],
+            workoutNotes: data.workoutNotes as string | undefined,
+            date: (data.date as Timestamp).toDate().toISOString(),
+          } as SavedWorkout;
+        });
+        setSavedWorkouts(prev => [...prev, ...newWorkoutList]);
+        
+        const lastVisible = workoutSnapshot.docs[workoutSnapshot.docs.length - 1];
+        setLastVisibleDoc(lastVisible);
+        
+        if (workoutSnapshot.docs.length < WORKOUTS_PER_PAGE) {
+            setHasMore(false);
+        }
+
+    } catch (error) {
+        console.error("Error loading more workouts: ", error);
+        toast({ title: "Error loading more", description: "Could not fetch older workouts.", variant: "destructive"});
+    }
+    setIsLoadingMore(false);
+  }, [lastVisibleDoc, hasMore, toast]);
+
 
    useEffect(() => {
     if (isClient) {
@@ -121,7 +167,6 @@ export default function HomePage() {
 
     const exercisesForDay: ExerciseDefinition[] = newDay === 'push' ? PUSH_DAY_EXERCISES : PULL_DAY_EXERCISES;
     
-    // If it's a new day, reset everything
     if (!isSameDay) {
         setCurrentWorkout({
           type: newDay,
@@ -133,7 +178,7 @@ export default function HomePage() {
           workoutNotes: '',
         });
         toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
-    } else { // If it's the SAME day, refresh the list but keep progress and custom exercises
+    } else { 
         const existingProgress = new Map<string, ExerciseLogEntry>();
         currentWorkout.exercises.forEach(ex => {
             existingProgress.set(ex.exerciseId, ex);
@@ -383,7 +428,10 @@ export default function HomePage() {
         savedWorkouts={savedWorkouts} 
         onDeleteWorkout={handleDeleteWorkout} 
         onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
-        isLoading={isLoadingHistory} 
+        isLoading={isLoadingHistory}
+        onLoadMore={handleLoadMore}
+        hasMore={hasMore}
+        isLoadingMore={isLoadingMore}
       />
 
       <WorkoutEvolution savedWorkouts={savedWorkouts} />
@@ -400,3 +448,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    

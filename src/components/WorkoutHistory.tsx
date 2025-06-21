@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -24,9 +25,20 @@ interface WorkoutHistoryProps {
   onDeleteWorkout: (workoutId: string) => void;
   onUpdateWorkoutNotes: (workoutId: string, newNotes: string) => void;
   isLoading: boolean;
+  onLoadMore: () => void;
+  hasMore: boolean;
+  isLoadingMore: boolean;
 }
 
-export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkoutNotes, isLoading }: WorkoutHistoryProps) {
+export function WorkoutHistory({ 
+  savedWorkouts, 
+  onDeleteWorkout, 
+  onUpdateWorkoutNotes, 
+  isLoading,
+  onLoadMore,
+  hasMore,
+  isLoadingMore 
+}: WorkoutHistoryProps) {
   const [activeWorkoutId, setActiveWorkoutId] = React.useState<string | null>(null);
   const [workoutToDeleteId, setWorkoutToDeleteId] = React.useState<string | null>(null);
   const [editingWorkout, setEditingWorkout] = React.useState<{ id: string; notes: string } | null>(null);
@@ -199,6 +211,27 @@ export function WorkoutHistory({ savedWorkouts, onDeleteWorkout, onUpdateWorkout
           );
         })}
       </div>
+      {hasMore && (
+        <div className="mt-6 text-center">
+            <Button
+                onClick={onLoadMore}
+                disabled={isLoadingMore}
+                variant="outline"
+                className="lowercase"
+            >
+                {isLoadingMore ? (
+                    <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        loading...
+                    </>
+                ) : (
+                    "load more"
+                )}
+            </Button>
+        </div>
+      )}
     </div>
   );
 }
+
+    
