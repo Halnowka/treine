@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import type { WorkoutType, ExerciseLogEntry, SavedWorkout, CurrentWorkout, ExerciseDefinition } from '@/types';
+import type { WorkoutType, ExerciseLogEntry, SavedWorkout, CurrentWorkout, ExerciseDefinition, SetData } from '@/types';
 import { PUSH_DAY_EXERCISES, PULL_DAY_EXERCISES } from '@/lib/exercises';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
@@ -10,13 +10,15 @@ import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Wand2 } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2, Plus } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from "firebase/firestore";
 import { parseISO } from 'date-fns';
+import { AddExerciseDialog } from '@/components/AddExerciseDialog';
+import { WorkoutEvolution } from '@/components/WorkoutEvolution';
 
 
 const LOCAL_STORAGE_KEY_CURRENT_WORKOUT = 'kineticTrackerCurrentWorkout';
@@ -26,6 +28,7 @@ export default function HomePage() {
   const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -77,31 +80,46 @@ export default function HomePage() {
       currentWorkout.exercises.some(ex => ex.sets.length > 0) ||
       (currentWorkout.workoutNotes && currentWorkout.workoutNotes.trim() !== '');
 
-    if (isSameDay) {
-      if (hasExistingProgress) {
-        toast({ title: "workout resumed", description: `continuing with your ${newDay} workout.` });
-      }
-      return;
-    }
-
-    if (currentWorkout.type !== null && hasExistingProgress) {
+    if (!isSameDay && hasExistingProgress) {
       if (!confirm("you have unsaved progress (sets or notes). changing workout type will clear it. continue?")) {
         return; 
       }
     }
 
     const exercisesForDay: ExerciseDefinition[] = newDay === 'push' ? PUSH_DAY_EXERCISES : PULL_DAY_EXERCISES;
-    setCurrentWorkout({
-      type: newDay,
-      exercises: exercisesForDay.map(ex => ({
-        exerciseId: ex.id,
-        exerciseName: ex.name,
-        sets: [],
-      })),
-      workoutNotes: '', 
-    });
-    toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
+    
+    // If it's a new day, reset everything
+    if (!isSameDay) {
+        setCurrentWorkout({
+          type: newDay,
+          exercises: exercisesForDay.map(ex => ({
+            exerciseId: ex.id,
+            exerciseName: ex.name,
+            sets: [], 
+          })),
+          workoutNotes: '',
+        });
+        toast({ title: "workout started", description: `selected ${newDay} day. let's go!` });
+    } else { // If it's the SAME day, refresh the list but keep progress and custom exercises
+        const existingProgress = new Map<string, ExerciseLogEntry>();
+        currentWorkout.exercises.forEach(ex => {
+            existingProgress.set(ex.exerciseId, ex);
+        });
+
+        const newBaseExercises = exercisesForDay.map(exDef => 
+            existingProgress.get(exDef.id) || { exerciseId: exDef.id, exerciseName: exDef.name, sets: [] }
+        );
+
+        const customExercises = currentWorkout.exercises.filter(ex => ex.exerciseId.startsWith('custom-'));
+        
+        setCurrentWorkout(prev => ({
+            ...prev,
+            type: newDay,
+            exercises: [...newBaseExercises, ...customExercises],
+        }));
+    }
   }, [currentWorkout, toast]);
+
 
   const handleUpdateExerciseLog = useCallback((updatedLog: ExerciseLogEntry) => {
     setCurrentWorkout(prev => ({
@@ -221,12 +239,34 @@ export default function HomePage() {
     }
   }, [toast]);
 
-  if (!isClient || isLoadingHistory) {
+  const handleAddCustomExercise = useCallback((exerciseName: string) => {
+    if (!currentWorkout.type) {
+        toast({ title: "select a workout day first", variant: "destructive"});
+        return;
+    }
+    const newExercise: ExerciseLogEntry = {
+      exerciseId: `custom-${exerciseName.toLowerCase().replace(/\s+/g, '-')}-${crypto.randomUUID()}`,
+      exerciseName: exerciseName,
+      sets: [],
+    };
+
+    setCurrentWorkout(prev => ({
+      ...prev,
+      exercises: [...prev.exercises, newExercise],
+    }));
+
+    toast({
+      title: "exercise added",
+      description: `"${exerciseName}" has been added to your workout.`,
+    });
+  }, [toast, currentWorkout.type]);
+
+  if (!isClient) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
         <Header />
         <p className="text-xl text-primary lowercase">loading treine...</p>
-        {isLoadingHistory && <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>}
+        <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>
       </div>
     );
   }
@@ -255,6 +295,17 @@ export default function HomePage() {
             onDeleteSet={handleDeleteSet}
           />
         ))}
+         {currentWorkout.type && (
+            <div className="flex items-center justify-center">
+                <button
+                onClick={() => setIsAddExerciseDialogOpen(true)}
+                className="text-muted-foreground/70 hover:text-primary transition-colors"
+                aria-label="add custom exercise"
+                >
+                <Plus className="h-10 w-10" />
+                </button>
+            </div>
+        )}
       </div>
       
       {currentWorkout.type && currentWorkout.exercises.length === 0 && (
@@ -301,7 +352,15 @@ export default function HomePage() {
         onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
         isLoading={isLoadingHistory} 
       />
+
+      <WorkoutEvolution savedWorkouts={savedWorkouts} />
       
+      <AddExerciseDialog 
+        isOpen={isAddExerciseDialogOpen}
+        onOpenChange={setIsAddExerciseDialogOpen}
+        onAddExercise={handleAddCustomExercise}
+      />
+
       <footer className="text-center mt-12 py-6 border-t border-border">
         <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
       </footer>
