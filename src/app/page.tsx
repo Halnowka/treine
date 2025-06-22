@@ -9,7 +9,7 @@ import { Header } from '@/components/Header';
 import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Wand2, Plus, Loader2, BarChart, Orbit, CalendarCheck2, TrendingUp } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2, Plus, Loader2, BarChart, Database, CalendarCheck2, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -468,7 +468,7 @@ export default function HomePage() {
           <AccordionItem value="history">
             <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
               <div className="flex items-center">
-                <Orbit className="mr-3 h-8 w-8" /> workout history
+                <Database className="mr-3 h-8 w-8" /> workout history
               </div>
             </AccordionTrigger>
             <AccordionContent>
@@ -524,3 +524,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    

@@ -1,8 +1,9 @@
+
 "use client";
 
 import type { WorkoutType } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Sparkle, Orbit } from 'lucide-react';
+import { Sparkle, Magnet } from 'lucide-react';
 
 interface WorkoutDayToggleProps {
   selectedDay: WorkoutType | null;
@@ -30,8 +31,10 @@ export function WorkoutDayToggle({ selectedDay, onSelectDay }: WorkoutDayToggleP
         }`}
         aria-pressed={selectedDay === 'pull'}
       >
-        <Orbit className="mr-2 h-5 w-5" /> pull day
+        <Magnet className="mr-2 h-5 w-5" /> pull day
       </Button>
     </div>
   );
 }
+
+    
