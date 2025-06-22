@@ -1,9 +1,11 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 
 interface RestTimerProps {
   isOpen: boolean;
+  onClose: () => void;
 }
 
 const formatTime = (totalSeconds: number) => {
@@ -12,7 +14,7 @@ const formatTime = (totalSeconds: number) => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export function RestTimer({ isOpen }: RestTimerProps) {
+export function RestTimer({ isOpen, onClose }: RestTimerProps) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
@@ -32,9 +34,10 @@ export function RestTimer({ isOpen }: RestTimerProps) {
 
   return (
     <div 
-      className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center text-center"
+      onClick={onClose}
+      className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center text-center cursor-pointer"
     >
-      <div className="relative" onClick={(e) => e.stopPropagation()}>
+      <div className="relative">
         <div className="font-headline text-8xl md:text-9xl text-primary select-none" style={{ fontVariantNumeric: 'tabular-nums' }}>
           {formatTime(seconds)}
         </div>

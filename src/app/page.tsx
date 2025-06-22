@@ -576,6 +576,7 @@ export default function HomePage() {
         />
         <RestTimer 
           isOpen={isRestTimerOpen}
+          onClose={() => setIsRestTimerOpen(false)}
         />
       </div>
     </div>
