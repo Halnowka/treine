@@ -27,40 +27,36 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet }: QuickSe
     onOpenChange(false); // Close dialog after selection
   };
 
-  // Base classes from ShadCN's DialogContent for consistent behavior and animations
-  const dialogPrimitiveContentBaseClasses = "fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]";
-  // Specific classes for this dialog's appearance
-  const quickSetDialogSpecificClasses = "sm:max-w-[160px] bg-card text-card-foreground border-border shadow-xl p-2";
+  const pickerContainerClasses = "w-40 bg-card border border-primary/50 p-2 shadow-2xl";
+  const contentWrapperClasses = "fixed inset-0 z-50 flex items-center justify-center";
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content
-          className={cn(dialogPrimitiveContentBaseClasses, quickSetDialogSpecificClasses)}
-          onEscapeKeyDown={(e) => {
-            // Radix Dialog handles escape by default if onOpenChange is provided to root
-            // This explicit handler is mostly for clarity or if specific logic was needed
-            if (isOpen) {
-                onOpenChange(false);
-            }
-          }}
+          className={cn(
+            contentWrapperClasses,
+            "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+          )}
+          onEscapeKeyDown={() => onOpenChange(false)}
         >
-          <ScrollArea className="h-[240px] w-full">
-            <div className="flex flex-col space-y-1 p-1">
-              {repOptions.map(r => (
-                <Button
-                  key={r}
-                  variant="ghost"
-                  className="w-full justify-center text-lg py-2 h-auto"
-                  onClick={() => handleRepSelection(String(r))}
-                >
-                  {r}
-                </Button>
-              ))}
-            </div>
-          </ScrollArea>
-          {/* The 'X' close button (DialogPrimitive.Close) is intentionally omitted here */}
+          <div className={pickerContainerClasses}>
+            <ScrollArea className="h-80 w-full">
+                <div className="flex flex-col space-y-1 p-1">
+                {repOptions.map(r => (
+                    <Button
+                    key={r}
+                    variant="ghost"
+                    className="w-full justify-center text-3xl font-headline py-4 h-auto text-primary hover:bg-accent hover:text-accent-foreground"
+                    onClick={() => handleRepSelection(String(r))}
+                    >
+                    {r}
+                    </Button>
+                ))}
+                </div>
+            </ScrollArea>
+          </div>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
