@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -10,16 +11,20 @@ interface HeaderProps {
   isRestTimerOpen?: boolean;
 }
 
+const tailFrames = ['ノ', '_', 'ヽ', '_'];
+
 export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProps) {
-  const [tail, setTail] = useState('ノ');
+  const [tailFrameIndex, setTailFrameIndex] = useState(0);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setTail(prevTail => (prevTail === 'ノ' ? 'ー' : 'ノ'));
-    }, 600); // A calm tail wag interval
+      setTailFrameIndex(prevIndex => (prevIndex + 1) % tailFrames.length);
+    }, 500); // Slower and multi-frame animation
 
     return () => clearInterval(intervalId); // Cleanup on component unmount
   }, []);
+  
+  const tail = tailFrames[tailFrameIndex];
 
   return (
     <header className="mb-8 grid grid-cols-3 items-center relative z-60">
