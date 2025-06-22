@@ -395,17 +395,16 @@ export default function HomePage() {
         aria-hidden="true"
       >
         <svg
+          viewBox="0 0 24 24"
+          fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 100 100"
-          className="absolute left-1/2 top-1/2 h-auto w-full max-w-[80rem] -translate-x-1/2 -translate-y-1/2 text-primary/10"
+          className="absolute left-1/2 top-1/2 h-auto w-full max-w-[80rem] -translate-x-1/2 -translate-y-1/2 text-foreground/20"
         >
-          <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2.5" />
-          <path d="M50 10 V 90" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M10 50 H 90" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M22.5 22.5 L 77.5 77.5" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
-          <path d="M22.5 77.5 L 77.5 22.5" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
-          <path d="M15 70 C 35 95, 65 95, 85 70" stroke="currentColor" strokeWidth="2.5" fill="none" />
-          <path d="M 75 20 L 78 15 L 81 20 L 86 23 L 81 26 L 78 31 L 75 26 L 70 23 Z" fill="currentColor" />
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 2C14.5013 4.73918 15.9228 8.28291 16 12C15.9228 15.7171 14.5013 19.2608 12 22" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 22C9.49872 19.2608 8.07725 15.7171 8 12C8.07725 8.28291 9.49872 4.73918 12 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M2.5 9.5H21.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M3.5 14.5H20.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </div>
       
