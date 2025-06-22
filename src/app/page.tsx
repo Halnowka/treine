@@ -395,16 +395,16 @@ export default function HomePage() {
         aria-hidden="true"
       >
         <svg
-          viewBox="0 0 24 24"
+          viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="absolute left-1/2 top-1/2 h-auto w-full max-w-[80rem] -translate-x-1/2 -translate-y-1/2 text-foreground/20"
         >
-          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12 2C14.5013 4.73918 15.9228 8.28291 16 12C15.9228 15.7171 14.5013 19.2608 12 22" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12 22C9.49872 19.2608 8.07725 15.7171 8 12C8.07725 8.28291 9.49872 4.73918 12 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M2.5 9.5H21.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M3.5 14.5H20.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M50 5C25.1472 5 5 25.1472 5 50C5 74.8528 25.1472 95 50 95C74.8528 95 95 74.8528 95 50C95 25.1472 74.8528 5 50 5Z" stroke="currentColor" strokeWidth="1"/>
+          <path d="M50 5C50 5 65.5 25 65.5 50C65.5 75 50 95 50 95" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M50 5C50 5 34.5 25 34.5 50C34.5 75 50 95 50 95" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12.7583 25.4385C12.7583 25.4385 32.5 35.5 50 35.5C67.5 35.5 87.2417 25.4385 87.2417 25.4385" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12.7583 74.5615C12.7583 74.5615 32.5 64.5 50 64.5C67.5 64.5 87.2417 74.5615 87.2417 74.5615" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </div>
       
@@ -542,5 +542,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    
