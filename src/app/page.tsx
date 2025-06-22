@@ -19,6 +19,7 @@ import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 import dynamic from 'next/dynamic';
 import { WorkoutCalendar } from '@/components/WorkoutCalendar';
 import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
+import { RestTimer } from '@/components/RestTimer';
 
 const WORKOUTS_PER_PAGE = 5;
 
@@ -61,6 +62,7 @@ type View = 'workout' | 'history' | 'calendar' | 'evolution';
 export default function HomePage() {
   const [activeView, setActiveView] = useState<View>('workout');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRestTimerOpen, setIsRestTimerOpen] = useState(false);
   const [currentWorkout, setCurrentWorkout] = useState<CurrentWorkout>({ type: null, exercises: [], workoutNotes: '' });
   const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([]);
   const [restDays, setRestDays] = useState<Date[]>([]);
@@ -73,7 +75,7 @@ export default function HomePage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (isMenuOpen) {
+    if (isMenuOpen || isRestTimerOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -81,7 +83,7 @@ export default function HomePage() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, isRestTimerOpen]);
 
   useEffect(() => {
     setIsClient(true);
@@ -406,7 +408,7 @@ export default function HomePage() {
   if (!isClient) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
-        <Header onMenuToggle={() => {}} />
+        <Header onMenuToggle={() => {}} onCatClick={() => {}} />
         <p className="text-xl text-primary lowercase">loading treine...</p>
         <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>
       </div>
@@ -420,7 +422,10 @@ export default function HomePage() {
       </div>
 
       <div className="relative flex flex-col min-h-screen p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
-        <Header onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} />
+        <Header 
+          onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} 
+          onCatClick={() => setIsRestTimerOpen(true)} 
+        />
         
         {isMenuOpen && (
             <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-40 flex flex-col items-center justify-center text-center">
@@ -567,6 +572,10 @@ export default function HomePage() {
           isOpen={isAddExerciseDialogOpen}
           onOpenChange={setIsAddExerciseDialogOpen}
           onAddExercise={handleAddCustomExercise}
+        />
+        <RestTimer 
+          isOpen={isRestTimerOpen}
+          onClose={() => setIsRestTimerOpen(false)}
         />
       </div>
     </div>

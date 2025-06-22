@@ -5,9 +5,10 @@ import { Menu } from 'lucide-react';
 
 interface HeaderProps {
   onMenuToggle: () => void;
+  onCatClick: () => void;
 }
 
-export function Header({ onMenuToggle }: HeaderProps) {
+export function Header({ onMenuToggle, onCatClick }: HeaderProps) {
   const [tail, setTail] = useState('ノ');
 
   useEffect(() => {
@@ -20,12 +21,18 @@ export function Header({ onMenuToggle }: HeaderProps) {
 
   return (
     <header className="mb-8 grid grid-cols-3 items-center relative z-50">
-        <pre className="text-muted-foreground text-xs leading-tight select-none justify-self-start">
+        <button 
+          onClick={onCatClick} 
+          className="p-0 bg-transparent border-none cursor-pointer justify-self-start focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
+          aria-label="start rest timer"
+        >
+          <pre className="text-muted-foreground text-xs leading-tight select-none">
 {`  l、
 （ﾟ､ ｡ ７
   l  ~ヽ
   じしf_,)${tail}`}
-        </pre>
+          </pre>
+        </button>
         
         <h1 className="text-4xl font-headline font-bold text-primary justify-self-center">TREINE</h1>
         
