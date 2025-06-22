@@ -21,9 +21,12 @@ export function Header({ onMenuToggle, onCatClick }: HeaderProps) {
 
   return (
     <header className="mb-8 grid grid-cols-3 items-center relative z-50">
-        <button 
+        <div 
           onClick={onCatClick} 
-          className="p-0 bg-transparent border-none cursor-pointer justify-self-start focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
+          className="justify-self-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCatClick(); }}
           aria-label="start rest timer"
         >
           <pre className="text-muted-foreground text-xs leading-tight select-none">
@@ -32,7 +35,7 @@ export function Header({ onMenuToggle, onCatClick }: HeaderProps) {
   l  ~ヽ
   じしf_,)${tail}`}
           </pre>
-        </button>
+        </div>
         
         <h1 className="text-4xl font-headline font-bold text-primary justify-self-center">TREINE</h1>
         
