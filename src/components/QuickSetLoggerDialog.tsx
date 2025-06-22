@@ -103,7 +103,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
             <div
               ref={scrollerRef}
               onScroll={handleScroll}
-              className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory"
+              className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory [scroll-snap-stop:always]"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               <style>{`.snap-y::-webkit-scrollbar { display: none; }`}</style>
