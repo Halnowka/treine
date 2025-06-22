@@ -114,7 +114,7 @@ export function WorkoutHistory({
                       <AlertDialogTrigger asChild>
                         <button
                             onClick={(e) => openDeleteDialog(workout.id, e)}
-                            className="p-1 text-destructive hover:text-red-400 rounded-full hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            className="p-1 text-destructive hover:text-red-400 hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             aria-label="delete workout"
                         >
                             <XCircle className="h-5 w-5" />
@@ -140,7 +140,7 @@ export function WorkoutHistory({
               </CardHeader>
               {isExpanded && (
                 <CardContent className="pt-2 pb-4 space-y-4">
-                  <div className="p-3 bg-muted/30 rounded-md border border-border/30">
+                  <div className="p-3 bg-muted/30 border border-border/30">
                       <div className="flex justify-between items-center mb-1">
                           <h4 className="font-semibold text-accent text-md flex items-center lowercase">
                               <FileText className="mr-2 h-5 w-5" />
@@ -181,7 +181,7 @@ export function WorkoutHistory({
                         {workout.exercises.map((exerciseLog) => {
                           const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
                           return (
-                            <li key={exerciseLog.exerciseId} className="p-3 bg-muted/50 rounded-md border border-border/50">
+                            <li key={exerciseLog.exerciseId} className="p-3 bg-muted/50 border border-border/50">
                               <h5 className="font-semibold text-primary text-lg lowercase">{exerciseLog.exerciseName}</h5>
                               <ul className="space-y-1 mt-1 pl-4 list-disc list-inside text-sm lowercase">
                                 {exerciseLog.sets.map((set, idx) => (

@@ -32,7 +32,7 @@
     --input: 0 0% 14.9%; /* Dark input background */
     --ring: 0 0% 80%; /* Primary color for focus rings */
 
-    --radius: 0.5rem;
+    --radius: 0rem;
 
     /* Chart colors (using defaults, can be adjusted if charts are added) */
     --chart-1: 220 70% 50%;
