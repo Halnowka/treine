@@ -11,9 +11,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // Set Inter as the primary font for body and headline
-        body: ['var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-inter)', 'sans-serif'],
+        // Set Roboto Mono as the primary font for body and headline
+        body: ['var(--font-roboto-mono)', 'monospace'],
+        headline: ['var(--font-roboto-mono)', 'monospace'],
         code: ['monospace'], // Default monospace font for code
       },
       colors: {

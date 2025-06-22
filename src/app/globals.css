@@ -97,8 +97,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Ensure the Inter font from layout.tsx is applied */
-    font-family: var(--font-inter), sans-serif;
+    /* Ensure the Roboto Mono font from layout.tsx is applied */
+    font-family: var(--font-roboto-mono), monospace;
   }
 
   .day-push:not([aria-selected]) {
