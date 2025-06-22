@@ -389,143 +389,144 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-background text-foreground p-4 md:p-8 selection:bg-primary selection:text-primary-foreground overflow-hidden">
-      
-      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-20 pointer-events-none">
+    <div className="bg-background text-foreground">
+      <div className="fixed inset-0 z-0 flex items-center justify-center opacity-20 pointer-events-none">
         <img src="/globe.svg" alt="Globe background" className="w-[80vw] h-[80vh] object-contain" style={{ filter: 'invert(1)' }}/>
       </div>
 
-      <Header />
-      <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
-      
-      {!currentWorkout.type && (
-         <Alert className="my-8 border-accent bg-card shadow-md">
-           <Info className="h-5 w-5 text-accent" />
-           <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to treine!</AlertTitle>
-           <AlertDescription className="text-muted-foreground text-base lowercase">
-             select 'push day' or 'pull day' above to start logging your exercises. your progress will be saved to the cloud!
-           </AlertDescription>
-         </Alert>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 mb-10">
-        {currentWorkout.exercises.map(exerciseLog => (
-          <ExerciseCard
-            key={exerciseLog.exerciseId}
-            exerciseLog={exerciseLog}
-            onUpdateExerciseLog={handleUpdateExerciseLog}
-            onDeleteSet={handleDeleteSet}
-          />
-        ))}
-         {currentWorkout.type && (
-            <div className="flex items-center justify-center">
-                <button
-                onClick={() => setIsAddExerciseDialogOpen(true)}
-                className="text-muted-foreground/70 hover:text-primary transition-colors"
-                aria-label="add custom exercise"
-                >
-                <Plus className="h-10 w-10" />
-                </button>
-            </div>
-        )}
-      </div>
-      
-      {currentWorkout.type && currentWorkout.exercises.length === 0 && (
-          <Alert variant="destructive" className="my-8">
-            <AlertTriangle className="h-5 w-5" />
-            <AlertTitle className="font-headline lowercase">no exercises loaded</AlertTitle>
-            <AlertDescription className="lowercase">
-              there might be an issue loading exercises for {currentWorkout.type} day. please try selecting the day again.
+      <div className="relative z-10 flex flex-col min-h-screen p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
+        <Header />
+        <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
+        
+        {!currentWorkout.type && (
+          <Alert className="my-8 border-accent bg-card shadow-md">
+            <Info className="h-5 w-5 text-accent" />
+            <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to treine!</AlertTitle>
+            <AlertDescription className="text-muted-foreground text-base lowercase">
+              select 'push day' or 'pull day' above to start logging your exercises. your progress will be saved to the cloud!
             </AlertDescription>
           </Alert>
-      )}
+        )}
 
-      {currentWorkout.type && (
-        <div className="my-6 space-y-6">
-          <div className="max-w-xl mx-auto">
-            <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
-              <Wand2 className="mr-2 h-5 w-5" />
-              workout notes ({currentWorkout.type} day)
-            </Label>
-            <Textarea
-              id="workoutNotes"
-              placeholder="add general notes for this workout (e.g., how you felt, overall rpe, etc.)..."
-              value={currentWorkout.workoutNotes || ''}
-              onChange={handleWorkoutNotesChange}
-              className="min-h-[100px] text-base bg-card border-border shadow-sm"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 mb-10">
+          {currentWorkout.exercises.map(exerciseLog => (
+            <ExerciseCard
+              key={exerciseLog.exerciseId}
+              exerciseLog={exerciseLog}
+              onUpdateExerciseLog={handleUpdateExerciseLog}
+              onDeleteSet={handleDeleteSet}
             />
-          </div>
-          <div className="text-center">
-            <Button 
-              onClick={handleSaveWorkout} 
-              size="lg" 
-              className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 lowercase"
-              disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
-            >
-              <Save className="mr-2 h-6 w-6" /> save current workout
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-10 space-y-4">
-        <Accordion type="multiple" className="w-full space-y-4">
-          <AccordionItem value="history">
-            <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
-              <div className="flex items-center">
-                <Orbit className="mr-3 h-8 w-8" /> workout history
+          ))}
+          {currentWorkout.type && (
+              <div className="flex items-center justify-center">
+                  <button
+                  onClick={() => setIsAddExerciseDialogOpen(true)}
+                  className="text-muted-foreground/70 hover:text-primary transition-colors"
+                  aria-label="add custom exercise"
+                  >
+                  <Plus className="h-10 w-10" />
+                  </button>
               </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <WorkoutHistory 
-                savedWorkouts={savedWorkouts} 
-                onDeleteWorkout={handleDeleteWorkout} 
-                onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
-                isLoading={isLoadingHistory}
-                onLoadMore={handleLoadMore}
-                hasMore={hasMore}
-                isLoadingMore={isLoadingMore}
-              />
-            </AccordionContent>
-          </AccordionItem>
+          )}
+        </div>
         
-          <AccordionItem value="calendar">
-            <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
-                <div className="flex items-center">
-                    <CalendarCheck2 className="mr-3 h-8 w-8" /> workout calendar
-                </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <WorkoutCalendar 
-                savedWorkouts={savedWorkouts} 
-                restDays={restDays}
-                onDayClick={(day) => handleToggleRestDay(day)}
+        {currentWorkout.type && currentWorkout.exercises.length === 0 && (
+            <Alert variant="destructive" className="my-8">
+              <AlertTriangle className="h-5 w-5" />
+              <AlertTitle className="font-headline lowercase">no exercises loaded</AlertTitle>
+              <AlertDescription className="lowercase">
+                there might be an issue loading exercises for {currentWorkout.type} day. please try selecting the day again.
+              </AlertDescription>
+            </Alert>
+        )}
+
+        {currentWorkout.type && (
+          <div className="my-6 space-y-6">
+            <div className="max-w-xl mx-auto">
+              <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
+                <Wand2 className="mr-2 h-5 w-5" />
+                workout notes ({currentWorkout.type} day)
+              </Label>
+              <Textarea
+                id="workoutNotes"
+                placeholder="add general notes for this workout (e.g., how you felt, overall rpe, etc.)..."
+                value={currentWorkout.workoutNotes || ''}
+                onChange={handleWorkoutNotesChange}
+                className="min-h-[100px] text-base bg-card border-border shadow-sm"
               />
-            </AccordionContent>
-          </AccordionItem>
+            </div>
+            <div className="text-center">
+              <Button 
+                onClick={handleSaveWorkout} 
+                size="lg" 
+                className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 lowercase"
+                disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
+              >
+                <Save className="mr-2 h-6 w-6" /> save current workout
+              </Button>
+            </div>
+          </div>
+        )}
 
-          <AccordionItem value="evolution">
-            <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
-                 <div className="flex items-center">
-                    <TrendingUp className="mr-3 h-8 w-8" /> workout evolution
-                 </div>
-            </AccordionTrigger>
-            <AccordionContent>
-                <WorkoutEvolution savedWorkouts={savedWorkouts} />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        <div className="mt-10 space-y-4">
+          <Accordion type="multiple" className="w-full space-y-4">
+            <AccordionItem value="history">
+              <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
+                <div className="flex items-center">
+                  <Orbit className="mr-3 h-8 w-8" /> workout history
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <WorkoutHistory 
+                  savedWorkouts={savedWorkouts} 
+                  onDeleteWorkout={handleDeleteWorkout} 
+                  onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
+                  isLoading={isLoadingHistory}
+                  onLoadMore={handleLoadMore}
+                  hasMore={hasMore}
+                  isLoadingMore={isLoadingMore}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          
+            <AccordionItem value="calendar">
+              <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
+                  <div className="flex items-center">
+                      <CalendarCheck2 className="mr-3 h-8 w-8" /> workout calendar
+                  </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <WorkoutCalendar 
+                  savedWorkouts={savedWorkouts} 
+                  restDays={restDays}
+                  onDayClick={(day) => handleToggleRestDay(day)}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="evolution">
+              <AccordionTrigger className="text-3xl font-headline text-primary mb-2 flex w-full justify-center p-2 lowercase hover:no-underline rounded-md hover:bg-muted/30">
+                   <div className="flex items-center">
+                      <TrendingUp className="mr-3 h-8 w-8" /> workout evolution
+                   </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                  <WorkoutEvolution savedWorkouts={savedWorkouts} />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+        
+        <AddExerciseDialog 
+          isOpen={isAddExerciseDialogOpen}
+          onOpenChange={setIsAddExerciseDialogOpen}
+          onAddExercise={handleAddCustomExercise}
+        />
+
+        <footer className="text-center mt-12 py-6 border-t border-border">
+          <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
+        </footer>
       </div>
-      
-      <AddExerciseDialog 
-        isOpen={isAddExerciseDialogOpen}
-        onOpenChange={setIsAddExerciseDialogOpen}
-        onAddExercise={handleAddCustomExercise}
-      />
-
-      <footer className="text-center mt-12 py-6 border-t border-border">
-        <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
-      </footer>
     </div>
   );
 }
