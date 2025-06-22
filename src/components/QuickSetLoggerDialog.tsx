@@ -22,14 +22,41 @@ interface QuickSetLoggerDialogProps {
 
 export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseName, lastRepCount }: QuickSetLoggerDialogProps) {
   const repOptions = React.useMemo(() => {
-    if (lastRepCount && lastRepCount > 0) {
-      // Generate a centered list of 5 reps around the last count
-      const start = Math.max(1, lastRepCount - 2);
-      return Array.from({ length: 5 }, (_, i) => start + i);
-    }
-    // Default list if no previous reps
+    // Always generate the full list to allow scrolling
     return Array.from({ length: 50 }, (_, i) => i + 1);
-  }, [lastRepCount]);
+  }, []);
+
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    // No-op if not open or ref not attached
+    if (!isOpen || !viewportRef.current) return;
+
+    const scrollContainer = viewportRef.current;
+    
+    // Defer scrolling to allow for render & animation
+    setTimeout(() => {
+      if (!viewportRef.current) return;
+
+      if (lastRepCount) {
+        const buttonToCenter = scrollContainer.querySelector(`[data-rep-value="${lastRepCount}"]`) as HTMLButtonElement | null;
+        
+        if (buttonToCenter) {
+            const containerHeight = scrollContainer.offsetHeight;
+            const buttonTop = buttonToCenter.offsetTop;
+            const buttonHeight = buttonToCenter.offsetHeight;
+            
+            const scrollTop = buttonTop - (containerHeight / 2) + (buttonHeight / 2);
+            
+            scrollContainer.scrollTo({ top: scrollTop, behavior: 'smooth' });
+        }
+      } else {
+        // If no last rep count, just scroll to the top.
+        scrollContainer.scrollTo({ top: 0, behavior: 'auto' });
+      }
+    }, 100);
+
+  }, [isOpen, lastRepCount]);
 
 
   const handleRepSelection = (value: string) => {
@@ -53,7 +80,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
           onEscapeKeyDown={() => onOpenChange(false)}
         >
           <div className={pickerContainerClasses}>
-            <ScrollArea className="h-96 w-full">
+            <ScrollArea viewportRef={viewportRef} className="h-96 w-full">
                 <div className="flex flex-col space-y-1 p-1">
                 {repOptions.map(r => (
                     <Button
@@ -61,6 +88,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
                     variant="ghost"
                     className="w-full justify-center text-3xl font-headline py-4 h-auto text-primary hover:bg-accent hover:text-accent-foreground"
                     onClick={() => handleRepSelection(String(r))}
+                    data-rep-value={r}
                     >
                     {r}
                     </Button>
