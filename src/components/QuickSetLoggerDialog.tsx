@@ -18,62 +18,58 @@ interface QuickSetLoggerDialogProps {
 
 const itemHeight = 64; // h-16
 const baseRepOptions = Array.from({ length: 50 }, (_, i) => i + 1);
-const repOptions = [...baseRepOptions, ...baseRepOptions, ...baseRepOptions]; // Render 3 times for infinite scroll illusion
+// Render 3 times for a seamless infinite scroll illusion.
+const repOptions = [...baseRepOptions, ...baseRepOptions, ...baseRepOptions]; 
 
 export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseName }: QuickSetLoggerDialogProps) {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
-  // Use a ref to prevent the scroll handler from being re-created on every render.
-  const isJumpingRef = React.useRef(false);
-  const scrollTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isJumpingRef = React.useRef(false); // Ref to prevent scroll handler from firing during manual jumps
 
   const getLocalStorageKey = (name: string) => `treine_last_rep_${name.replace(/\s+/g, '_')}`;
 
-  // useLayoutEffect is critical here. It runs synchronously after DOM mutations,
-  // ensuring the scroll position is set before the browser paints. This avoids flickering.
-  React.useLayoutEffect(() => {
-    if (isOpen && scrollerRef.current) {
-      const key = getLocalStorageKey(exerciseName);
-      // Default to 8 reps if no value is found.
-      const lastRepCount = parseInt(localStorage.getItem(key) || '8', 10);
-      
-      // Calculate the index in the MIDDLE section of the triplicated array.
-      const initialIndex = (lastRepCount - 1) + baseRepOptions.length;
-      const initialScrollTop = initialIndex * itemHeight;
+  // This handler is the key. It fires only after the dialog's open animation is complete.
+  const handleOpenAutoFocus = (event: Event) => {
+    // Prevent the dialog from automatically focusing on the first focusable element.
+    event.preventDefault();
 
-      // Set the scroll position directly and instantly.
-      scrollerRef.current.scrollTop = initialScrollTop;
+    if (scrollerRef.current) {
+        const key = getLocalStorageKey(exerciseName);
+        // Default to 8 reps if no value is found in local storage.
+        const lastRepCount = parseInt(localStorage.getItem(key) || '8', 10);
+        
+        // Calculate the index in the MIDDLE section of the triplicated array.
+        // This ensures there's ample room to scroll up or down.
+        const initialIndex = (lastRepCount - 1) + baseRepOptions.length;
+        const initialScrollTop = initialIndex * itemHeight;
+
+        // Set the scroll position instantly.
+        scrollerRef.current.scrollTop = initialScrollTop;
     }
-  }, [isOpen, exerciseName]);
+  };
   
   const handleScroll = () => {
-    // If we are programmatically jumping, ignore this scroll event.
+    // If we are programmatically jumping, ignore this scroll event to prevent infinite loops.
     if (isJumpingRef.current) {
       isJumpingRef.current = false;
       return;
     }
 
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
+    if (!scrollerRef.current) return;
     
-    // Debounce the scroll handling to avoid excessive calculations.
-    scrollTimeoutRef.current = setTimeout(() => {
-      if (!scrollerRef.current) return;
-      
-      const { scrollTop } = scrollerRef.current;
-      const sectionHeight = baseRepOptions.length * itemHeight;
+    const { scrollTop, scrollHeight } = scrollerRef.current;
+    // Use the actual rendered height for more robust calculation
+    const sectionHeight = scrollHeight / 3;
 
-      // If scrolled near the top buffer, jump to the corresponding item in the middle section.
-      if (scrollTop < sectionHeight) {
-        isJumpingRef.current = true; // Mark that we are about to jump
-        scrollerRef.current.scrollTop += sectionHeight;
-      } 
-      // If scrolled near the bottom buffer, jump to the corresponding item in the middle section.
-      else if (scrollTop >= sectionHeight * 2) {
-        isJumpingRef.current = true; // Mark that we are about to jump
-        scrollerRef.current.scrollTop -= sectionHeight;
-      }
-    }, 150); // A 150ms debounce is a good balance.
+    // If scrolled near the top buffer, jump to the corresponding item in the middle section.
+    if (scrollTop < sectionHeight) {
+      isJumpingRef.current = true; // Mark that we are about to jump
+      scrollerRef.current.scrollTop += sectionHeight;
+    } 
+    // If scrolled near the bottom buffer, jump to the corresponding item in the middle section.
+    else if (scrollTop >= sectionHeight * 2) {
+      isJumpingRef.current = true; // Mark that we are about to jump
+      scrollerRef.current.scrollTop -= sectionHeight;
+    }
   };
 
   const handleRepSelection = (reps: number) => {
@@ -96,6 +92,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
             "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
           )}
           onEscapeKeyDown={() => onOpenChange(false)}
+          onOpenAutoFocus={handleOpenAutoFocus}
         >
           <div className="relative" style={{ height: `${containerHeight}px`, width: '10rem' }}>
             <div className="absolute top-0 left-0 z-10 h-2/5 w-full bg-gradient-to-b from-background to-transparent pointer-events-none" />
