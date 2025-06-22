@@ -11,7 +11,7 @@ interface HeaderProps {
   isRestTimerOpen?: boolean;
 }
 
-const tailFrames = ['ノ', 'ヽ_', '__'];
+const tailFrames = ['ノ', '__', '_ヽ'];
 
 export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProps) {
   const [tailFrameIndex, setTailFrameIndex] = useState(0);
