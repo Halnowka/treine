@@ -6,10 +6,9 @@ import type { WorkoutType, ExerciseLogEntry, SavedWorkout, CurrentWorkout, Exerc
 import { PUSH_DAY_EXERCISES, PULL_DAY_EXERCISES } from '@/lib/exercises';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
-import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { useToast } from "@/hooks/use-toast";
-import { Save, AlertTriangle, Info, Wand2, Plus, Loader2, BarChart, Orbit, CalendarCheck2, TrendingUp } from 'lucide-react';
+import { Save, AlertTriangle, Info, Wand2, Plus, Loader2, BarChart, Orbit, CalendarCheck2, TrendingUp, Dumbbell, Menu } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -19,7 +18,6 @@ import { isSameDay, parseISO, startOfDay } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 import dynamic from 'next/dynamic';
 import { WorkoutCalendar } from '@/components/WorkoutCalendar';
-import { ViewSwitcher } from '@/components/ViewSwitcher';
 
 const WORKOUTS_PER_PAGE = 5;
 
@@ -42,7 +40,7 @@ const WorkoutEvolution = dynamic(() =>
   { 
     loading: () => (
       <div className="mt-10">
-        <div className="flex flex-col items-center justify-center h-[342px] text-center bg-card rounded-lg border border-border">
+        <div className="flex flex-col items-center justify-center h-[342px] text-center bg-card">
             <BarChart className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground lowercase">
               loading chart...
@@ -61,6 +59,7 @@ type View = 'workout' | 'history' | 'calendar' | 'evolution';
 
 export default function HomePage() {
   const [activeView, setActiveView] = useState<View>('workout');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentWorkout, setCurrentWorkout] = useState<CurrentWorkout>({ type: null, exercises: [], workoutNotes: '' });
   const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkout[]>([]);
   const [restDays, setRestDays] = useState<Date[]>([]);
@@ -379,11 +378,23 @@ export default function HomePage() {
       }
     });
   }, [savedWorkouts, toast]);
+  
+  const handleNavigationClick = (view: View) => {
+    setActiveView(view);
+    setIsMenuOpen(false);
+  };
+  
+  const navItems: { id: View; label: string; icon: React.ReactNode }[] = [
+    { id: 'workout', label: 'workout', icon: <Dumbbell className="h-6 w-6" /> },
+    { id: 'history', label: 'history', icon: <Orbit className="h-6 w-6" /> },
+    { id: 'calendar', label: 'calendar', icon: <CalendarCheck2 className="h-6 w-6" /> },
+    { id: 'evolution', label: 'evolution', icon: <TrendingUp className="h-6 w-6" /> },
+  ];
 
   if (!isClient) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
-        <Header />
+        <Header onMenuToggle={() => {}} />
         <p className="text-xl text-primary lowercase">loading treine...</p>
         <p className="text-md text-muted-foreground lowercase">accessing workout history...</p>
       </div>
@@ -396,138 +407,155 @@ export default function HomePage() {
         <img src="/globe.svg" alt="Globe background" className="w-[80vw] h-[80vh] object-contain" style={{ filter: 'invert(1)' }}/>
       </div>
 
-      <div className="relative z-10 flex flex-col min-h-screen p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
-        <Header />
+      <div className="relative flex flex-col min-h-screen p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
+        <Header onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} />
         
-        <ViewSwitcher activeView={activeView} setActiveView={setActiveView} />
-
-        {activeView === 'workout' && (
-          <main>
-            <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
-            
-            {!currentWorkout.type && (
-              <Alert className="my-8 border-accent bg-card shadow-md">
-                <Info className="h-5 w-5 text-accent" />
-                <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to treine!</AlertTitle>
-                <AlertDescription className="text-muted-foreground text-base lowercase">
-                  select 'push day' or 'pull day' above to start logging your exercises. your progress will be saved to the cloud!
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 mb-10">
-              {currentWorkout.exercises.map(exerciseLog => (
-                <ExerciseCard
-                  key={exerciseLog.exerciseId}
-                  exerciseLog={exerciseLog}
-                  onUpdateExerciseLog={handleUpdateExerciseLog}
-                  onDeleteSet={handleDeleteSet}
-                />
-              ))}
-              {currentWorkout.type && (
-                  <div className="flex items-center justify-center">
-                      <button
-                      onClick={() => setIsAddExerciseDialogOpen(true)}
-                      className="text-muted-foreground/70 hover:text-primary transition-colors"
-                      aria-label="add custom exercise"
-                      >
-                      <Plus className="h-10 w-10" />
-                      </button>
-                  </div>
-              )}
+        {isMenuOpen && (
+            <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-40 flex flex-col items-center justify-center text-center">
+                <nav className="flex flex-col gap-8">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.id}
+                            onClick={() => handleNavigationClick(item.id)}
+                            className="flex items-center gap-4 text-4xl font-headline text-primary lowercase hover:text-accent transition-colors transform hover:scale-105"
+                        >
+                            {item.icon}
+                            <span>{item.label}</span>
+                        </button>
+                    ))}
+                </nav>
             </div>
-            
-            {currentWorkout.type && currentWorkout.exercises.length === 0 && (
-                <Alert variant="destructive" className="my-8">
-                  <AlertTriangle className="h-5 w-5" />
-                  <AlertTitle className="font-headline lowercase">no exercises loaded</AlertTitle>
-                  <AlertDescription className="lowercase">
-                    there might be an issue loading exercises for {currentWorkout.type} day. please try selecting the day again.
+        )}
+
+        <div className={isMenuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 transition-opacity'}>
+          {activeView === 'workout' && (
+            <main>
+              <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
+              
+              {!currentWorkout.type && (
+                <Alert className="my-8 border-accent bg-card shadow-md">
+                  <Info className="h-5 w-5 text-accent" />
+                  <AlertTitle className="font-headline text-accent text-xl lowercase">welcome to treine!</AlertTitle>
+                  <AlertDescription className="text-muted-foreground text-base lowercase">
+                    select 'push day' or 'pull day' above to start logging your exercises. your progress will be saved to the cloud!
                   </AlertDescription>
                 </Alert>
-            )}
+              )}
 
-            {currentWorkout.type && (
-              <div className="my-6 space-y-6">
-                <div className="max-w-xl mx-auto">
-                  <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
-                    <Wand2 className="mr-2 h-5 w-5" />
-                    workout notes ({currentWorkout.type} day)
-                  </Label>
-                  <Textarea
-                    id="workoutNotes"
-                    placeholder="add general notes for this workout (e.g., how you felt, overall rpe, etc.)..."
-                    value={currentWorkout.workoutNotes || ''}
-                    onChange={handleWorkoutNotesChange}
-                    className="min-h-[100px] text-base bg-card border-border shadow-sm"
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 mb-10">
+                {currentWorkout.exercises.map(exerciseLog => (
+                  <ExerciseCard
+                    key={exerciseLog.exerciseId}
+                    exerciseLog={exerciseLog}
+                    onUpdateExerciseLog={handleUpdateExerciseLog}
+                    onDeleteSet={handleDeleteSet}
                   />
-                </div>
-                <div className="text-center">
-                  <Button 
-                    onClick={handleSaveWorkout} 
-                    size="lg" 
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg transition-transform transform hover:scale-105 lowercase"
-                    disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
-                  >
-                    <Save className="mr-2 h-6 w-6" /> save current workout
-                  </Button>
-                </div>
+                ))}
+                {currentWorkout.type && (
+                    <div className="flex items-center justify-center">
+                        <button
+                        onClick={() => setIsAddExerciseDialogOpen(true)}
+                        className="text-muted-foreground/70 hover:text-primary transition-colors"
+                        aria-label="add custom exercise"
+                        >
+                        <Plus className="h-10 w-10" />
+                        </button>
+                    </div>
+                )}
               </div>
-            )}
-          </main>
-        )}
+              
+              {currentWorkout.type && currentWorkout.exercises.length === 0 && (
+                  <Alert variant="destructive" className="my-8">
+                    <AlertTriangle className="h-5 w-5" />
+                    <AlertTitle className="font-headline lowercase">no exercises loaded</AlertTitle>
+                    <AlertDescription className="lowercase">
+                      there might be an issue loading exercises for {currentWorkout.type} day. please try selecting the day again.
+                    </AlertDescription>
+                  </Alert>
+              )}
 
-        {activeView === 'history' && (
-          <div id="workout-history" className="mt-6">
-            <h2 className="text-3xl font-headline text-primary mb-6 flex w-full justify-center items-center p-2 lowercase">
-              <Orbit className="mr-3 h-8 w-8" />
-              workout history
-            </h2>
-            <WorkoutHistory 
-              savedWorkouts={savedWorkouts} 
-              onDeleteWorkout={handleDeleteWorkout} 
-              onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
-              isLoading={isLoadingHistory}
-              onLoadMore={handleLoadMore}
-              hasMore={hasMore}
-              isLoadingMore={isLoadingMore}
-            />
-          </div>
-        )}
+              {currentWorkout.type && (
+                <div className="my-6 space-y-6">
+                  <div className="max-w-xl mx-auto">
+                    <Label htmlFor="workoutNotes" className="text-lg font-semibold text-primary mb-2 flex items-center lowercase">
+                      <Wand2 className="mr-2 h-5 w-5" />
+                      workout notes ({currentWorkout.type} day)
+                    </Label>
+                    <Textarea
+                      id="workoutNotes"
+                      placeholder="add general notes for this workout (e.g., how you felt, overall rpe, etc.)..."
+                      value={currentWorkout.workoutNotes || ''}
+                      onChange={handleWorkoutNotesChange}
+                      className="min-h-[100px] text-base bg-card border-border shadow-sm"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <Button 
+                      onClick={handleSaveWorkout} 
+                      size="lg" 
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg transition-transform transform hover:scale-105 lowercase"
+                      disabled={currentWorkout.exercises.every(ex => ex.sets.length === 0) && (!currentWorkout.workoutNotes || currentWorkout.workoutNotes.trim() === '')}
+                    >
+                      <Save className="mr-2 h-6 w-6" /> save current workout
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </main>
+          )}
 
-        {activeView === 'calendar' && (
-          <div id="workout-calendar" className="mt-6">
-            <h2 className="text-3xl font-headline text-primary mb-6 flex w-full justify-center items-center p-2 lowercase">
-              <CalendarCheck2 className="mr-3 h-8 w-8" />
-              workout calendar
-            </h2>
-            <WorkoutCalendar 
-              savedWorkouts={savedWorkouts} 
-              restDays={restDays}
-              onDayClick={(day) => handleToggleRestDay(day)}
-            />
-          </div>
-        )}
-        
-        {activeView === 'evolution' && (
-          <div id="workout-evolution" className="mt-6">
-            <h2 className="text-3xl font-headline text-primary mb-6 flex w-full justify-center items-center p-2 lowercase">
-              <TrendingUp className="mr-3 h-8 w-8" />
-              workout evolution
-            </h2>
-            <WorkoutEvolution savedWorkouts={savedWorkouts} />
-          </div>
-        )}
+          {activeView === 'history' && (
+            <div id="workout-history" className="mt-6">
+              <h2 className="text-3xl font-headline text-primary mb-6 flex w-full justify-center items-center p-2 lowercase">
+                <Orbit className="mr-3 h-8 w-8" />
+                workout history
+              </h2>
+              <WorkoutHistory 
+                savedWorkouts={savedWorkouts} 
+                onDeleteWorkout={handleDeleteWorkout} 
+                onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
+                isLoading={isLoadingHistory}
+                onLoadMore={handleLoadMore}
+                hasMore={hasMore}
+                isLoadingMore={isLoadingMore}
+              />
+            </div>
+          )}
+
+          {activeView === 'calendar' && (
+            <div id="workout-calendar" className="mt-6">
+              <h2 className="text-3xl font-headline text-primary mb-6 flex w-full justify-center items-center p-2 lowercase">
+                <CalendarCheck2 className="mr-3 h-8 w-8" />
+                workout calendar
+              </h2>
+              <WorkoutCalendar 
+                savedWorkouts={savedWorkouts} 
+                restDays={restDays}
+                onDayClick={(day) => handleToggleRestDay(day)}
+              />
+            </div>
+          )}
+          
+          {activeView === 'evolution' && (
+            <div id="workout-evolution" className="mt-6">
+              <h2 className="text-3xl font-headline text-primary mb-6 flex w-full justify-center items-center p-2 lowercase">
+                <TrendingUp className="mr-3 h-8 w-8" />
+                workout evolution
+              </h2>
+              <WorkoutEvolution savedWorkouts={savedWorkouts} />
+            </div>
+          )}
+          
+          <footer className="text-center mt-12 py-6 border-t border-border">
+            <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
+          </footer>
+        </div>
         
         <AddExerciseDialog 
           isOpen={isAddExerciseDialogOpen}
           onOpenChange={setIsAddExerciseDialogOpen}
           onAddExercise={handleAddCustomExercise}
         />
-
-        <footer className="text-center mt-12 py-6 border-t border-border">
-          <p className="text-sm text-muted-foreground lowercase">&copy; {new Date().getFullYear()} treine. keep pushing, keep pulling!</p>
-        </footer>
       </div>
     </div>
   );
