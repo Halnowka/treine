@@ -32,30 +32,27 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
     // No-op if not open or ref not attached
     if (!isOpen || !viewportRef.current) return;
 
-    const scrollContainer = viewportRef.current;
-    
-    // Defer scrolling to allow for render & animation
-    setTimeout(() => {
+    // Defer scrolling to allow for render & animation.
+    // This gives the dialog time to open before we try to scroll.
+    const timer = setTimeout(() => {
       if (!viewportRef.current) return;
 
       if (lastRepCount) {
-        const buttonToCenter = scrollContainer.querySelector(`[data-rep-value="${lastRepCount}"]`) as HTMLButtonElement | null;
+        const buttonToCenter = viewportRef.current.querySelector(
+          `[data-rep-value="${lastRepCount}"]`
+        ) as HTMLButtonElement | null;
         
+        // Using scrollIntoView is a more robust, browser-native approach.
         if (buttonToCenter) {
-            const containerHeight = scrollContainer.offsetHeight;
-            const buttonTop = buttonToCenter.offsetTop;
-            const buttonHeight = buttonToCenter.offsetHeight;
-            
-            const scrollTop = buttonTop - (containerHeight / 2) + (buttonHeight / 2);
-            
-            scrollContainer.scrollTo({ top: scrollTop, behavior: 'smooth' });
+          buttonToCenter.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       } else {
         // If no last rep count, just scroll to the top.
-        scrollContainer.scrollTo({ top: 0, behavior: 'auto' });
+        viewportRef.current.scrollTo({ top: 0, behavior: 'auto' });
       }
-    }, 100);
+    }, 150); // Increased delay slightly for more reliability
 
+    return () => clearTimeout(timer);
   }, [isOpen, lastRepCount]);
 
 
