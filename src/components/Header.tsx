@@ -9,7 +9,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   return (
     <header className="mb-8 grid grid-cols-3 items-center relative z-50">
         <pre className="text-muted-foreground text-xs leading-tight select-none justify-self-start">
-{` l、
+{`  l、
 （ﾟ､ ｡ ７
   l  ~ヽ
   じしf_,)ノ`}
