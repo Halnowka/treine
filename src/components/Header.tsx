@@ -7,20 +7,19 @@ interface HeaderProps {
 
 export function Header({ onMenuToggle }: HeaderProps) {
   return (
-    <header className="mb-8 flex items-center justify-center relative z-50">
-        <div className="text-center">
-            <div className="flex items-center justify-center mb-2">
-                <h1 className="text-4xl font-headline font-bold text-primary">TREINE</h1>
-            </div>
+    <header className="mb-8 flex items-center justify-between relative z-50">
+        <div className="flex items-center gap-4">
             <pre className="text-muted-foreground text-xs leading-tight select-none">
-{` /\\_/\\
-( o.o )
- > ^ <`}
+{`／l、
+（ﾟ､ ｡ ７
+  l  ~ヽ
+  じしf_,)ノ`}
             </pre>
+            <h1 className="text-4xl font-headline font-bold text-primary">TREINE</h1>
         </div>
         <button
           onClick={onMenuToggle}
-          className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-accent transition-colors"
+          className="p-2 text-primary hover:text-accent transition-colors"
           aria-label="toggle navigation menu"
         >
           <Menu className="h-8 w-8" />
