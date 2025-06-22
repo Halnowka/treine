@@ -424,7 +424,8 @@ export default function HomePage() {
       <div className="relative flex flex-col min-h-screen p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
         <Header 
           onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} 
-          onCatClick={() => setIsRestTimerOpen(true)} 
+          onCatClick={() => setIsRestTimerOpen(!isRestTimerOpen)} 
+          isRestTimerOpen={isRestTimerOpen}
         />
         
         {isMenuOpen && (
@@ -575,7 +576,6 @@ export default function HomePage() {
         />
         <RestTimer 
           isOpen={isRestTimerOpen}
-          onClose={() => setIsRestTimerOpen(false)}
         />
       </div>
     </div>

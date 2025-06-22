@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   onMenuToggle: () => void;
   onCatClick: () => void;
+  isRestTimerOpen?: boolean;
 }
 
-export function Header({ onMenuToggle, onCatClick }: HeaderProps) {
+export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProps) {
   const [tail, setTail] = useState('ノ');
 
   useEffect(() => {
@@ -20,14 +22,14 @@ export function Header({ onMenuToggle, onCatClick }: HeaderProps) {
   }, []);
 
   return (
-    <header className="mb-8 grid grid-cols-3 items-center relative z-50">
+    <header className="mb-8 grid grid-cols-3 items-center relative z-60">
         <div 
           onClick={onCatClick} 
           className="justify-self-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCatClick(); }}
-          aria-label="start rest timer"
+          aria-label="toggle rest timer"
         >
           <pre className="text-muted-foreground text-xs leading-tight select-none">
 {`  l、
@@ -37,11 +39,17 @@ export function Header({ onMenuToggle, onCatClick }: HeaderProps) {
           </pre>
         </div>
         
-        <h1 className="text-4xl font-headline font-bold text-primary justify-self-center">TREINE</h1>
+        <h1 className={cn(
+          "text-4xl font-headline font-bold text-primary justify-self-center transition-opacity",
+          isRestTimerOpen && "opacity-0"
+        )}>TREINE</h1>
         
         <button
           onClick={onMenuToggle}
-          className="p-2 text-primary hover:text-accent transition-colors justify-self-end"
+          className={cn(
+            "p-2 text-primary hover:text-accent transition-all justify-self-end",
+            isRestTimerOpen && "opacity-0 pointer-events-none"
+          )}
           aria-label="toggle navigation menu"
         >
           <Menu className="h-8 w-8" />
