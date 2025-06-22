@@ -36,6 +36,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
   
   const setsContentId = `sets-content-${exerciseLog.exerciseId}`;
   const totalReps = exerciseLog.sets.reduce((sum, set) => sum + set.reps, 0);
+  const lastRepCount = exerciseLog.sets.length > 0 ? exerciseLog.sets[exerciseLog.sets.length - 1].reps : undefined;
 
   return (
     <Card className="relative bg-card text-card-foreground border-border shadow-md transition-all hover:shadow-lg">
@@ -120,6 +121,7 @@ export function ExerciseCard({ exerciseLog, onUpdateExerciseLog, onDeleteSet }: 
         onOpenChange={setIsQuickSetLoggerOpen}
         onLogSet={handleLogSet}
         exerciseName={exerciseLog.exerciseName}
+        lastRepCount={lastRepCount}
       />
     </Card>
   );

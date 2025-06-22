@@ -1,6 +1,7 @@
 
 "use client";
 
+import * as React from 'react';
 import {
   Dialog,
   DialogPortal,
@@ -16,10 +17,20 @@ interface QuickSetLoggerDialogProps {
   onOpenChange: (isOpen: boolean) => void;
   onLogSet: (reps: number, weight?: number) => void;
   exerciseName: string;
+  lastRepCount?: number;
 }
 
-export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet }: QuickSetLoggerDialogProps) {
-  const repOptions = Array.from({ length: 30 }, (_, i) => i + 1);
+export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseName, lastRepCount }: QuickSetLoggerDialogProps) {
+  const repOptions = React.useMemo(() => {
+    if (lastRepCount && lastRepCount > 0) {
+      // Generate a centered list of 5 reps around the last count
+      const start = Math.max(1, lastRepCount - 2);
+      return Array.from({ length: 5 }, (_, i) => start + i);
+    }
+    // Default list if no previous reps
+    return Array.from({ length: 12 }, (_, i) => i + 1);
+  }, [lastRepCount]);
+
 
   const handleRepSelection = (value: string) => {
     const numReps = parseInt(value, 10);
