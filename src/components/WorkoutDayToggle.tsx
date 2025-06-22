@@ -3,12 +3,46 @@
 
 import type { WorkoutType } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Sparkle, Magnet } from 'lucide-react';
+import { Sparkle } from 'lucide-react';
+import type { SVGProps } from 'react';
 
 interface WorkoutDayToggleProps {
   selectedDay: WorkoutType | null;
   onSelectDay: (day: WorkoutType) => void;
 }
+
+const PullDayIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M8 10L12 6L16 10"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 15L12 11L16 15"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 20L12 16L16 20"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 
 export function WorkoutDayToggle({ selectedDay, onSelectDay }: WorkoutDayToggleProps) {
   return (
@@ -31,7 +65,7 @@ export function WorkoutDayToggle({ selectedDay, onSelectDay }: WorkoutDayToggleP
         }`}
         aria-pressed={selectedDay === 'pull'}
       >
-        <Magnet className="mr-2 h-5 w-5" /> pull day
+        <PullDayIcon className="mr-2 h-5 w-5" /> pull day
       </Button>
     </div>
   );
