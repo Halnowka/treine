@@ -17,14 +17,11 @@ export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProp
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    if (frame === 0) { // Current frame is 'ノ'
-      // Transition to '_ヽ' quickly
+    if (frame === 0) {
       timeoutId = setTimeout(() => setFrame(1), 200);
-    } else if (frame === 1) { // Current frame is '_ヽ'
-      // Transition to '__' quickly
+    } else if (frame === 1) {
       timeoutId = setTimeout(() => setFrame(2), 200);
-    } else if (frame === 2) { // Current frame is '__'
-      // Pause for 3 seconds, then reset to 'ノ'
+    } else if (frame === 2) {
       timeoutId = setTimeout(() => setFrame(0), 3000);
     }
 
@@ -34,40 +31,38 @@ export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProp
   const tail = tailFrames[frame];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-60 bg-background border-b border-border/50">
-      <div className="mb-0 grid grid-cols-3 items-center relative p-2 md:p-4">
-        <div 
-          onClick={onCatClick} 
-          className="justify-self-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCatClick(); }}
-          aria-label="toggle rest timer"
-        >
-          <pre className="text-muted-foreground text-xs leading-tight select-none">
+    <header className="z-60 mb-0 grid grid-cols-3 items-center relative p-2 md:p-4">
+      <div 
+        onClick={onCatClick} 
+        className="justify-self-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onCatClick(); }}
+        aria-label="toggle rest timer"
+      >
+        <pre className="text-muted-foreground text-xs leading-tight select-none">
 {`  l、
 （ﾟ､ ｡ ７
   l  ~ヽ
   じしf_,)${tail}`}
-          </pre>
-        </div>
-        
-        <h1 className={cn(
-          "text-4xl font-headline font-bold text-primary justify-self-center transition-opacity",
-          isRestTimerOpen && "opacity-0"
-        )}>TREINE</h1>
-        
-        <button
-          onClick={onMenuToggle}
-          className={cn(
-            "p-2 text-primary hover:text-accent transition-all justify-self-end",
-            isRestTimerOpen && "opacity-0 pointer-events-none"
-          )}
-          aria-label="toggle navigation menu"
-        >
-          <Menu className="h-8 w-8" />
-        </button>
+        </pre>
       </div>
+      
+      <h1 className={cn(
+        "text-4xl font-headline font-bold text-primary justify-self-center transition-opacity",
+        isRestTimerOpen && "opacity-0"
+      )}>TREINE</h1>
+      
+      <button
+        onClick={onMenuToggle}
+        className={cn(
+          "p-2 text-primary hover:text-accent transition-all justify-self-end",
+          isRestTimerOpen && "opacity-0 pointer-events-none"
+        )}
+        aria-label="toggle navigation menu"
+      >
+        <Menu className="h-8 w-8" />
+      </button>
     </header>
   );
 }
