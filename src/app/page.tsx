@@ -395,7 +395,7 @@ export default function HomePage() {
         aria-hidden="true"
       >
         <div
-          className="absolute inset-0 bg-foreground/20"
+          className="absolute inset-0 bg-red-500"
           style={{
             maskImage: 'url(/globe.svg)',
             maskRepeat: 'no-repeat',
