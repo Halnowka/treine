@@ -390,25 +390,12 @@ export default function HomePage() {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground p-4 md:p-8 selection:bg-primary selection:text-primary-foreground overflow-hidden">
-      <div
-        className="pointer-events-none fixed inset-0 -z-10"
-        aria-hidden="true"
-      >
-        <div
-          className="absolute inset-0 bg-red-500"
-          style={{
-            maskImage: 'url(/globe.svg)',
-            maskRepeat: 'no-repeat',
-            maskPosition: 'center',
-            maskSize: 'contain',
-            WebkitMaskImage: 'url(/globe.svg)',
-            WebkitMaskRepeat: 'no-repeat',
-            WebkitMaskPosition: 'center',
-            WebkitMaskSize: 'contain',
-          }}
-        ></div>
-      </div>
       
+      {/* SVG DEBUG: Show the globe in the center of the screen */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 pointer-events-none">
+        <img src="/globe.svg" alt="Debug Globe" className="w-96 h-96" style={{ filter: 'invert(1)' }}/>
+      </div>
+
       <Header />
       <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
       
@@ -543,5 +530,4 @@ export default function HomePage() {
     </div>
   );
 }
-
     
