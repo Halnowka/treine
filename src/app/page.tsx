@@ -394,18 +394,19 @@ export default function HomePage() {
         className="pointer-events-none fixed inset-0 -z-10"
         aria-hidden="true"
       >
-        <svg
-          viewBox="0 0 100 100"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="absolute left-1/2 top-1/2 h-auto w-full max-w-[80rem] -translate-x-1/2 -translate-y-1/2 text-foreground/20"
-        >
-          <path d="M50 5C25.1472 5 5 25.1472 5 50C5 74.8528 25.1472 95 50 95C74.8528 95 95 74.8528 95 50C95 25.1472 74.8528 5 50 5Z" stroke="currentColor" strokeWidth="1"/>
-          <path d="M50 5C50 5 65.5 25 65.5 50C65.5 75 50 95 50 95" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M50 5C50 5 34.5 25 34.5 50C34.5 75 50 95 50 95" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12.7583 25.4385C12.7583 25.4385 32.5 35.5 50 35.5C67.5 35.5 87.2417 25.4385 87.2417 25.4385" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12.7583 74.5615C12.7583 74.5615 32.5 64.5 50 64.5C67.5 64.5 87.2417 74.5615 87.2417 74.5615" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <div
+          className="absolute inset-0 bg-foreground/20"
+          style={{
+            maskImage: 'url(/globe.svg)',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center',
+            maskSize: 'contain',
+            WebkitMaskImage: 'url(/globe.svg)',
+            WebkitMaskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            WebkitMaskSize: 'contain',
+          }}
+        ></div>
       </div>
       
       <Header />
@@ -542,3 +543,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
