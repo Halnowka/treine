@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -44,7 +43,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
         
         // Using scrollIntoView is a more robust, browser-native approach.
         if (buttonToCenter) {
-          buttonToCenter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          buttonToCenter.scrollIntoView({ behavior: 'auto', block: 'center' });
         }
       } else {
         // If no last rep count, just scroll to the top.
