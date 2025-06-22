@@ -445,7 +445,7 @@ export default function HomePage() {
             </div>
         )}
 
-        <div className={isMenuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 transition-opacity'}>
+        <div className={`${isMenuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 transition-opacity'} mt-20 md:mt-24`}>
           {activeView === 'workout' && (
             <main>
               <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
