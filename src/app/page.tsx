@@ -18,6 +18,7 @@ import { isSameDay, parseISO, startOfDay } from 'date-fns';
 import { AddExerciseDialog } from '@/components/AddExerciseDialog';
 import dynamic from 'next/dynamic';
 import { WorkoutCalendar } from '@/components/WorkoutCalendar';
+import { WorkoutDayToggle } from '@/components/WorkoutDayToggle';
 
 const WORKOUTS_PER_PAGE = 5;
 
