@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -23,44 +22,58 @@ const repOptions = [...baseRepOptions, ...baseRepOptions, ...baseRepOptions]; //
 
 export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseName }: QuickSetLoggerDialogProps) {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
+  // Use a ref to prevent the scroll handler from being re-created on every render.
+  const isJumpingRef = React.useRef(false);
   const scrollTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getLocalStorageKey = (name: string) => `treine_last_rep_${name.replace(/\s+/g, '_')}`;
 
-  React.useEffect(() => {
+  // useLayoutEffect is critical here. It runs synchronously after DOM mutations,
+  // ensuring the scroll position is set before the browser paints. This avoids flickering.
+  React.useLayoutEffect(() => {
     if (isOpen && scrollerRef.current) {
       const key = getLocalStorageKey(exerciseName);
+      // Default to 8 reps if no value is found.
       const lastRepCount = parseInt(localStorage.getItem(key) || '8', 10);
       
+      // Calculate the index in the MIDDLE section of the triplicated array.
       const initialIndex = (lastRepCount - 1) + baseRepOptions.length;
       const initialScrollTop = initialIndex * itemHeight;
 
-      const timer = setTimeout(() => {
-          if(scrollerRef.current) {
-              scrollerRef.current.scrollTo({ top: initialScrollTop, behavior: 'smooth' });
-          }
-      }, 100);
-
-      return () => clearTimeout(timer);
+      // Set the scroll position directly and instantly.
+      scrollerRef.current.scrollTop = initialScrollTop;
     }
   }, [isOpen, exerciseName]);
   
   const handleScroll = () => {
+    // If we are programmatically jumping, ignore this scroll event.
+    if (isJumpingRef.current) {
+      isJumpingRef.current = false;
+      return;
+    }
+
     if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      clearTimeout(scrollTimeoutRef.current);
     }
     
+    // Debounce the scroll handling to avoid excessive calculations.
     scrollTimeoutRef.current = setTimeout(() => {
-        if (!scrollerRef.current) return;
-        const { scrollTop } = scrollerRef.current;
-        const sectionHeight = baseRepOptions.length * itemHeight;
+      if (!scrollerRef.current) return;
+      
+      const { scrollTop } = scrollerRef.current;
+      const sectionHeight = baseRepOptions.length * itemHeight;
 
-        if (scrollTop < sectionHeight) {
-            scrollerRef.current.scrollTop += sectionHeight;
-        } else if (scrollTop >= sectionHeight * 2) {
-            scrollerRef.current.scrollTop -= sectionHeight;
-        }
-    }, 150);
+      // If scrolled near the top buffer, jump to the corresponding item in the middle section.
+      if (scrollTop < sectionHeight) {
+        isJumpingRef.current = true; // Mark that we are about to jump
+        scrollerRef.current.scrollTop += sectionHeight;
+      } 
+      // If scrolled near the bottom buffer, jump to the corresponding item in the middle section.
+      else if (scrollTop >= sectionHeight * 2) {
+        isJumpingRef.current = true; // Mark that we are about to jump
+        scrollerRef.current.scrollTop -= sectionHeight;
+      }
+    }, 150); // A 150ms debounce is a good balance.
   };
 
   const handleRepSelection = (reps: number) => {
