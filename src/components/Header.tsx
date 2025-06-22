@@ -11,20 +11,27 @@ interface HeaderProps {
   isRestTimerOpen?: boolean;
 }
 
-const tailFrames = ['ノ', '__', '_ヽ'];
-
 export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProps) {
-  const [tailFrameIndex, setTailFrameIndex] = useState(0);
+  const [frame, setFrame] = useState(0);
+  const tailFrames = ['ノ', '_ヽ', '__'];
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTailFrameIndex(prevIndex => (prevIndex + 1) % tailFrames.length);
-    }, 2000);
+    let timeoutId: NodeJS.Timeout;
+    if (frame === 0) { // Current frame is 'ノ'
+      // Transition to '_ヽ' quickly
+      timeoutId = setTimeout(() => setFrame(1), 200);
+    } else if (frame === 1) { // Current frame is '_ヽ'
+      // Transition to '__' quickly
+      timeoutId = setTimeout(() => setFrame(2), 200);
+    } else if (frame === 2) { // Current frame is '__'
+      // Pause for 3 seconds, then reset to 'ノ'
+      timeoutId = setTimeout(() => setFrame(0), 3000);
+    }
 
-    return () => clearInterval(intervalId);
-  }, []);
-  
-  const tail = tailFrames[tailFrameIndex];
+    return () => clearTimeout(timeoutId);
+  }, [frame]);
+
+  const tail = tailFrames[frame];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-60 bg-background border-b border-border/50">
