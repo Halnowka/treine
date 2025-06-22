@@ -8,22 +8,24 @@ import { cn } from '@/lib/utils';
 interface HeaderProps {
   onMenuToggle: () => void;
   onCatClick: () => void;
-  isRestTimerOpen?: boolean;
 }
 
-export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProps) {
+export function Header({ onMenuToggle, onCatClick }: HeaderProps) {
   const [frame, setFrame] = useState(0);
   const tailFrames = ['ノ', '_ヽ', '__'];
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    if (frame === 0) {
-      timeoutId = setTimeout(() => setFrame(1), 200);
-    } else if (frame === 1) {
-      timeoutId = setTimeout(() => setFrame(2), 200);
-    } else if (frame === 2) {
-      timeoutId = setTimeout(() => setFrame(0), 3000);
-    }
+    const sequence = [
+      { frame: 1, delay: 200 }, // to _ヽ
+      { frame: 2, delay: 200 }, // to __
+      { frame: 0, delay: 3000 }, // to ノ (after pause)
+    ];
+
+    const currentStep = sequence[frame];
+
+    const timeoutId = setTimeout(() => {
+      setFrame((prevFrame) => (prevFrame + 1) % sequence.length);
+    }, currentStep.delay);
 
     return () => clearTimeout(timeoutId);
   }, [frame]);
@@ -31,7 +33,7 @@ export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProp
   const tail = tailFrames[frame];
 
   return (
-    <header className="z-60 mb-0 grid grid-cols-3 items-center relative p-2 md:p-4">
+    <header className="z-10 mb-0 grid grid-cols-3 items-center relative p-2 md:p-4">
       <div 
         onClick={onCatClick} 
         className="justify-self-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
@@ -48,17 +50,13 @@ export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProp
         </pre>
       </div>
       
-      <h1 className={cn(
-        "text-4xl font-headline font-bold text-primary justify-self-center transition-opacity",
-        isRestTimerOpen && "opacity-0"
-      )}>TREINE</h1>
+      <h1 className="text-4xl font-headline font-bold text-primary justify-self-center">
+        TREINE
+      </h1>
       
       <button
         onClick={onMenuToggle}
-        className={cn(
-          "p-2 text-primary hover:text-accent transition-all justify-self-end",
-          isRestTimerOpen && "opacity-0 pointer-events-none"
-        )}
+        className="p-2 text-primary hover:text-accent transition-all justify-self-end"
         aria-label="toggle navigation menu"
       >
         <Menu className="h-8 w-8" />

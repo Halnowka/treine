@@ -424,8 +424,7 @@ export default function HomePage() {
       <div className="relative flex flex-col min-h-screen p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
         <Header 
           onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} 
-          onCatClick={() => setIsRestTimerOpen(!isRestTimerOpen)} 
-          isRestTimerOpen={isRestTimerOpen}
+          onCatClick={() => setIsRestTimerOpen(true)} 
         />
         
         {isMenuOpen && (
@@ -447,7 +446,7 @@ export default function HomePage() {
 
         <div className={`${isMenuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 transition-opacity'}`}>
           {activeView === 'workout' && (
-            <main>
+            <main className="mt-8">
               <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
               
               {!currentWorkout.type && (
