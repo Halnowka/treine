@@ -12,7 +12,11 @@ export function Header({ onMenuToggle }: HeaderProps) {
             <div className="flex items-center justify-center mb-2">
                 <h1 className="text-4xl font-headline font-bold text-primary">TREINE</h1>
             </div>
-            <p className="text-muted-foreground lowercase">log your push & pull workouts with ease.</p>
+            <pre className="text-muted-foreground text-xs leading-tight select-none">
+{` /\\_/\\
+( o.o )
+ > ^ <`}
+            </pre>
         </div>
         <button
           onClick={onMenuToggle}
