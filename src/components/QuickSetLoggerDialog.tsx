@@ -28,7 +28,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
       return Array.from({ length: 5 }, (_, i) => start + i);
     }
     // Default list if no previous reps
-    return Array.from({ length: 12 }, (_, i) => i + 1);
+    return Array.from({ length: 50 }, (_, i) => i + 1);
   }, [lastRepCount]);
 
 
@@ -53,7 +53,7 @@ export function QuickSetLoggerDialog({ isOpen, onOpenChange, onLogSet, exerciseN
           onEscapeKeyDown={() => onOpenChange(false)}
         >
           <div className={pickerContainerClasses}>
-            <ScrollArea className="h-80 w-full">
+            <ScrollArea className="h-96 w-full">
                 <div className="flex flex-col space-y-1 p-1">
                 {repOptions.map(r => (
                     <Button
