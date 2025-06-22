@@ -396,62 +396,16 @@ export default function HomePage() {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 800 800"
-          fill="none"
+          viewBox="0 0 100 100"
           className="absolute left-1/2 top-1/2 h-auto w-full max-w-[80rem] -translate-x-1/2 -translate-y-1/2 text-primary/10"
         >
-          <circle cx="400" cy="400" r="300" stroke="currentColor" strokeWidth="1.5" />
-          <ellipse
-            cx="400"
-            cy="400"
-            rx="300"
-            ry="100"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <ellipse
-            cx="400"
-            cy="400"
-            rx="300"
-            ry="200"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <ellipse
-            cx="400"
-            cy="400"
-            rx="100"
-            ry="300"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            transform="rotate(90 400 400)"
-          />
-          <ellipse
-            cx="400"
-            cy="400"
-            rx="200"
-            ry="300"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            transform="rotate(90 400 400)"
-          />
-          <ellipse
-            cx="400"
-            cy="400"
-            rx="300"
-            ry="270"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <ellipse
-            cx="400"
-            cy="400"
-            rx="270"
-            ry="300"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            transform="rotate(90 400 400)"
-          />
+          <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2.5" />
+          <path d="M50 10 V 90" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M10 50 H 90" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M22.5 22.5 L 77.5 77.5" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
+          <path d="M22.5 77.5 L 77.5 22.5" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
+          <path d="M15 70 C 35 95, 65 95, 85 70" stroke="currentColor" strokeWidth="2.5" fill="none" />
+          <path d="M 75 20 L 78 15 L 81 20 L 86 23 L 81 26 L 78 31 L 75 26 L 70 23 Z" fill="currentColor" />
         </svg>
       </div>
       
