@@ -11,7 +11,7 @@ interface HeaderProps {
   isRestTimerOpen?: boolean;
 }
 
-const tailFrames = ['ノ', '_', 'ヽ', '_'];
+const tailFrames = ['ノ', '__', 'ヽ', '__'];
 
 export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProps) {
   const [tailFrameIndex, setTailFrameIndex] = useState(0);
@@ -19,7 +19,7 @@ export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProp
   useEffect(() => {
     const intervalId = setInterval(() => {
       setTailFrameIndex(prevIndex => (prevIndex + 1) % tailFrames.length);
-    }, 500); // Slower and multi-frame animation
+    }, 800); // Slower and multi-frame animation
 
     return () => clearInterval(intervalId); // Cleanup on component unmount
   }, []);
