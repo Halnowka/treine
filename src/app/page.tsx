@@ -389,7 +389,72 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-8 selection:bg-primary selection:text-primary-foreground">
+    <div className="relative flex flex-col min-h-screen bg-background text-foreground p-4 md:p-8 selection:bg-primary selection:text-primary-foreground overflow-hidden">
+      <div
+        className="pointer-events-none fixed inset-0 -z-10"
+        aria-hidden="true"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 800 800"
+          fill="none"
+          className="absolute left-1/2 top-1/2 h-auto w-full max-w-[80rem] -translate-x-1/2 -translate-y-1/2 text-primary/10"
+        >
+          <circle cx="400" cy="400" r="300" stroke="currentColor" strokeWidth="1.5" />
+          <ellipse
+            cx="400"
+            cy="400"
+            rx="300"
+            ry="100"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <ellipse
+            cx="400"
+            cy="400"
+            rx="300"
+            ry="200"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <ellipse
+            cx="400"
+            cy="400"
+            rx="100"
+            ry="300"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            transform="rotate(90 400 400)"
+          />
+          <ellipse
+            cx="400"
+            cy="400"
+            rx="200"
+            ry="300"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            transform="rotate(90 400 400)"
+          />
+          <ellipse
+            cx="400"
+            cy="400"
+            rx="300"
+            ry="270"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <ellipse
+            cx="400"
+            cy="400"
+            rx="270"
+            ry="300"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            transform="rotate(90 400 400)"
+          />
+        </svg>
+      </div>
+      
       <Header />
       <WorkoutDayToggle selectedDay={currentWorkout.type} onSelectDay={handleSelectDay} />
       
@@ -524,7 +589,5 @@ export default function HomePage() {
     </div>
   );
 }
-
-    
 
     
