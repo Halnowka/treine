@@ -11,7 +11,7 @@ interface HeaderProps {
   isRestTimerOpen?: boolean;
 }
 
-const tailFrames = ['ノ', 'ヽ'];
+const tailFrames = ['ノ', 'ヽ_', '__'];
 
 export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProps) {
   const [tailFrameIndex, setTailFrameIndex] = useState(0);
@@ -21,13 +21,14 @@ export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProp
       setTailFrameIndex(prevIndex => (prevIndex + 1) % tailFrames.length);
     }, 2000);
 
-    return () => clearInterval(intervalId); // Cleanup on component unmount
+    return () => clearInterval(intervalId);
   }, []);
   
   const tail = tailFrames[tailFrameIndex];
 
   return (
-    <header className="mb-8 grid grid-cols-3 items-center relative z-60">
+    <header className="fixed top-0 left-0 right-0 z-60 bg-background border-b border-border/50">
+      <div className="mb-0 grid grid-cols-3 items-center relative p-2 md:p-4">
         <div 
           onClick={onCatClick} 
           className="justify-self-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
@@ -59,6 +60,7 @@ export function Header({ onMenuToggle, onCatClick, isRestTimerOpen }: HeaderProp
         >
           <Menu className="h-8 w-8" />
         </button>
+      </div>
     </header>
   );
 }
